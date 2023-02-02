@@ -4,7 +4,7 @@ import com.somecompany.bookstore.model.entity.Payment;
 import com.somecompany.bookstore.controller.dto.PaymentDto;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring", uses = {UserMapper.class, OrderMapper.class})
+@Mapper(uses = {UserMapper.class, OrderMapper.class})
 public interface PaymentMapper {
     PaymentDto toDto(Payment payment);
 

@@ -4,7 +4,7 @@ import com.somecompany.bookstore.model.entity.Author;
 import com.somecompany.bookstore.controller.dto.AuthorDto;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface AuthorMapper {
     AuthorDto toDto(Author author);
 

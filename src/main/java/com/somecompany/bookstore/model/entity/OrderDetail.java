@@ -1,14 +1,15 @@
 package com.somecompany.bookstore.model.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,19 +18,21 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+
 @Entity
 @Table(name = "order_details")
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
+@Getter
+@Setter
 public class OrderDetail implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    @ToString.Exclude
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "order_id", referencedColumnName = "id")
     private Order order;
     @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "book_id")

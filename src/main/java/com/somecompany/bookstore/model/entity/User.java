@@ -1,11 +1,12 @@
 package com.somecompany.bookstore.model.entity;
 
 import com.somecompany.bookstore.model.entity.enums.Role;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,15 +21,16 @@ import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
-import java.util.Objects;
 
+@Entity
+@NamedEntityGraph(name = "Person.withLogin", attributeNodes = @NamedAttributeNode("login"))
+@Table(name = "users")
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
 @Getter
 @Setter
-@ToString
-@RequiredArgsConstructor
-@Entity
-@Table(name = "users")
-@NamedEntityGraph(name = "Person.withLogin", attributeNodes = @NamedAttributeNode("login"))
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,17 +48,4 @@ public class User implements Serializable {
     private Role role;
     @OneToOne(cascade = CascadeType.ALL)
     private Login login;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        User user = (User) o;
-        return id != null && Objects.equals(id, user.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

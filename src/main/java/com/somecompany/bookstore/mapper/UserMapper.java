@@ -5,7 +5,7 @@ import com.somecompany.bookstore.controller.dto.UserDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface UserMapper {
     @Mapping(target = "login.password", ignore = true)
     UserDto toDto(User user);
