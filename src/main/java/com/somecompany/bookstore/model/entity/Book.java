@@ -31,13 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "books")
-@AllArgsConstructor
-@NoArgsConstructor
-@EqualsAndHashCode
-@ToString
 @Getter
 @Setter
+@ToString
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "books")
 public class Book implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,13 +52,13 @@ public class Book implements Serializable {
     private Integer yearOfPublication;
     @Column(name = "price")
     private BigDecimal price;
-    @Enumerated(EnumType.STRING)
     @Column(name = "cover")
+    @Enumerated(EnumType.STRING)
     private Cover cover;
+    @BatchSize(size = 10)
+    @Fetch(FetchMode.SELECT)
     @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     @JoinTable(name = "books_authors", joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "author_id"))
-    @Fetch(FetchMode.SELECT)
-    @BatchSize(size = 10)
     private List<Author> authors = new ArrayList<>();
 }

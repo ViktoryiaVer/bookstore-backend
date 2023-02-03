@@ -11,7 +11,7 @@ import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(uses = {UserMapper.class})
-public abstract class PaymentWriteMapper {
+public abstract class PaymentCreateMapper {
     @Autowired
     private UserService userService;
     @Autowired

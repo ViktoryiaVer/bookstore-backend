@@ -8,8 +8,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Mapper(uses = {BookWriteMapper.class})
-public abstract class OrderDetailWriteMapper {
+@Mapper(uses = {BookCreateMapper.class})
+public abstract class OrderDetailCreateMapper {
     @Autowired
     private BookService bookService;
 

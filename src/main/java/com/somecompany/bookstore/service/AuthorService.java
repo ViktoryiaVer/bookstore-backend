@@ -1,8 +1,8 @@
 package com.somecompany.bookstore.service;
 
-import com.somecompany.bookstore.exception.author.AuthorAlreadyExistsException;
-import com.somecompany.bookstore.exception.author.AuthorNotFoundException;
-import com.somecompany.bookstore.exception.author.AuthorServiceException;
+import com.somecompany.bookstore.exception.NotFoundException;
+import com.somecompany.bookstore.exception.ObjectAlreadyExistsException;
+import com.somecompany.bookstore.exception.ServiceException;
 import com.somecompany.bookstore.model.entity.Author;
 import com.somecompany.bookstore.model.repository.AuthorRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Objects;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class AuthorService {
     private final AuthorRepository authorRepository;
     private final MessageSource messageSource;
@@ -27,16 +27,13 @@ public class AuthorService {
     }
 
     public Author getById(Long id) {
-        return authorRepository.findById(id).orElseThrow(() -> {
-            throw new AuthorNotFoundException(messageSource.getMessage("msg.error.author.find.by.id", null,
-                    LocaleContextHolder.getLocale()));
-        });
+        return authorRepository.findByIdOrException(authorRepository, id);
     }
 
     @Transactional
     public Author save(Author author) {
         if (authorRepository.existsByFirstNameAndLastName(author.getFirstName(), author.getLastName())) {
-            throw new AuthorAlreadyExistsException(messageSource.getMessage("msg.error.author.exists", null,
+            throw new ObjectAlreadyExistsException(messageSource.getMessage("msg.error.author.exists", null,
                     LocaleContextHolder.getLocale()));
         }
         return authorRepository.save(author);
@@ -45,13 +42,13 @@ public class AuthorService {
     @Transactional
     public Author update(Author author) {
         if (!authorRepository.existsById(author.getId())) {
-            throw new AuthorServiceException(messageSource.getMessage("msg.error.author.update", null,
+            throw new ServiceException(messageSource.getMessage("msg.error.author.update", null,
                     LocaleContextHolder.getLocale()));
         }
 
         Optional<Author> existingAuthor = authorRepository.findAuthorByFirstNameAndLastName(author.getFirstName(), author.getLastName());
         if (existingAuthor.isPresent() && !Objects.equals(existingAuthor.get().getId(), author.getId())) {
-            throw new AuthorAlreadyExistsException(messageSource.getMessage("msg.error.author.exists", null,
+            throw new ObjectAlreadyExistsException(messageSource.getMessage("msg.error.author.exists", null,
                     LocaleContextHolder.getLocale()));
         }
         return authorRepository.save(author);
@@ -61,19 +58,15 @@ public class AuthorService {
     public void deleteById(Long id) {
         Optional<Author> existingAuthor = authorRepository.findById(id);
         if (existingAuthor.isEmpty()) {
-            throw new AuthorNotFoundException(messageSource.getMessage("msg.error.author.find.by.id", null,
+            throw new NotFoundException(messageSource.getMessage("msg.error.author.find.by.id", null,
                     LocaleContextHolder.getLocale()));
         }
 
         if (authorRepository.checkIfAuthorHasABook(id)) {
-            throw new AuthorServiceException(messageSource.getMessage("msg.error.author.delete", null,
+            throw new ServiceException(messageSource.getMessage("msg.error.author.delete", null,
                     LocaleContextHolder.getLocale()));
         }
 
         authorRepository.deleteById(id);
-    }
-
-    public boolean existsById(Long id) {
-        return authorRepository.existsById(id);
     }
 }

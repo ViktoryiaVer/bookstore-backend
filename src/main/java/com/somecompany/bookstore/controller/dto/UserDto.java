@@ -14,22 +14,22 @@ import javax.validation.constraints.Size;
 @Data
 public class UserDto {
     private Long id;
-    @Pattern(regexp = RegExpConstant.NAME, message = "{msg.validation.first.name.not.valid}")
     @NotBlank(message = "{msg.validation.first.name.empty}")
+    @Pattern(regexp = RegExpConstant.NAME, message = "{msg.validation.first.name.not.valid}")
     private String firstName;
-    @Pattern(regexp = RegExpConstant.NAME, message = "{msg.validation.last.name.not.valid}")
     @NotBlank(message = "{msg.validation.last.name.empty}")
+    @Pattern(regexp = RegExpConstant.NAME, message = "{msg.validation.last.name.not.valid}")
     private String lastName;
-    @Email(message = "{msg.validation.email.not.valid}")
     @NotBlank(message = "{msg.validation.email.empty}")
+    @Email(message = "{msg.validation.email.not.valid}")
     private String email;
-    @Pattern(regexp = RegExpConstant.PHONE, message = "{msg.validation.phone.not.valid}")
-    @Size(min = 11, message = "{msg.validation.phone.length}")
     @NotBlank(message = "{msg.validation.phone.empty}")
+    @Size(min = 11, message = "{msg.validation.phone.length}")
+    @Pattern(regexp = RegExpConstant.PHONE, message = "{msg.validation.phone.not.valid}")
     private String phoneNumber;
     @NotNull(message = "{msg.validation.role.empty}")
     private Role role;
-    @NotNull(message = "{msg.validation.login.null}")
     @Valid
+    @NotNull(message = "{msg.validation.login.null}")
     private LoginDto login;
 }

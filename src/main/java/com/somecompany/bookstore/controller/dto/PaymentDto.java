@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 @Data
 public class PaymentDto {
     private Long id;
+    @Valid
     @NotNull(message = "{msg.validation.user.null}")
-    @Valid
     private UserDto user;
-    @NotNull(message = "{msg.validation.order.null}")
     @Valid
+    @NotNull(message = "{msg.validation.order.null}")
     private OrderDto order;
     @NotNull(message = "{msg.validation.payment.time.null}")
     private LocalDateTime paymentTime;

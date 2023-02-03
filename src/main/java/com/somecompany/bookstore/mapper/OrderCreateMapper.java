@@ -9,8 +9,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Mapper(uses = {OrderDetailWriteMapper.class, UserMapper.class}, collectionMappingStrategy = CollectionMappingStrategy.ADDER_PREFERRED)
-public abstract class OrderWriteMapper {
+@Mapper(uses = {OrderDetailCreateMapper.class, UserMapper.class}, collectionMappingStrategy = CollectionMappingStrategy.ADDER_PREFERRED)
+public abstract class OrderCreateMapper {
     @Autowired
     private UserService userService;
 

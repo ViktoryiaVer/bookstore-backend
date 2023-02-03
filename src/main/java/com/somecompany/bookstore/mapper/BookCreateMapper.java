@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 
 @Mapper(uses = AuthorMapper.class)
-public abstract class BookWriteMapper {
+public abstract class BookCreateMapper {
     @Autowired
     private AuthorService authorService;
 

@@ -20,13 +20,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "order_details")
-@AllArgsConstructor
-@NoArgsConstructor
-@EqualsAndHashCode
-@ToString
 @Getter
 @Setter
+@ToString
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "order_details")
 public class OrderDetail implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,8 +34,8 @@ public class OrderDetail implements Serializable {
     @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "order_id", referencedColumnName = "id")
     private Order order;
-    @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "book_id")
+    @ManyToOne(cascade = CascadeType.REFRESH)
     private Book book;
     @Column(name = "book_price")
     private BigDecimal bookPrice;

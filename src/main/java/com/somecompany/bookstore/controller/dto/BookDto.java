@@ -24,19 +24,19 @@ public class BookDto {
     private String publisher;
     @NotBlank(message = "{msg.validation.isbn.empty}")
     private String isbn;
-    @Digits(integer = 4, fraction = 0, message = "{msg.validation.publication.year.not.valid}")
-    @Min(value = 1800, message = "{msg.validation.publication.year.not.valid}")
-    @Max(value = 2100, message = "{msg.validation.publication.year.not.valid}")
     @NotNull(message = "{msg.validation.publication.year.empty}")
+    @Max(value = 2100, message = "{msg.validation.publication.year.not.valid}")
+    @Min(value = 1800, message = "{msg.validation.publication.year.not.valid}")
+    @Digits(integer = 4, fraction = 0, message = "{msg.validation.publication.year.not.valid}")
     private Integer yearOfPublication;
-    @DecimalMax(value = "10000.00", inclusive = false, message = "{msg.validation.price.max}")
-    @DecimalMin(value = "0.0", inclusive = false, message = "{msg.validation.price.min}")
-    @Digits(integer = 6, fraction = 2, message = "{msg.validation.price.not.valid}")
     @NotNull(message = "{msg.validation.price.empty}")
+    @Digits(integer = 6, fraction = 2, message = "{msg.validation.price.not.valid}")
+    @DecimalMin(value = "0.0", inclusive = false, message = "{msg.validation.price.min}")
+    @DecimalMax(value = "10000.00", inclusive = false, message = "{msg.validation.price.max}")
     private BigDecimal price;
     @NotNull(message = "{msg.validation.cover.empty}")
     private Cover cover;
-    @NotNull(message = "{msg.validation.authors.null}")
     @Valid
+    @NotNull(message = "{msg.validation.authors.null}")
     private List<AuthorDto> authors = new ArrayList<>();
 }

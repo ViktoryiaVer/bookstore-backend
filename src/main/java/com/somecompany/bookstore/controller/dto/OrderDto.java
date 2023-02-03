@@ -15,18 +15,18 @@ import java.util.List;
 @Data
 public class OrderDto {
     private Long id;
-    @NotNull(message = "{msg.validation.user.null}")
     @Valid
+    @NotNull(message = "{msg.validation.user.null}")
     private UserDto user;
-    @DecimalMax(value = "10000.00", inclusive = false, message = "{msg.validation.total.cost.max}")
-    @DecimalMin(value = "0.0", inclusive = false, message = "{msg.validation.total.cost.min}")
-    @Digits(integer = 6, fraction = 2, message = "{msg.validation.total.cost.not.valid}")
     @NotNull(message = "{msg.validation.total.cost.empty}")
+    @Digits(integer = 6, fraction = 2, message = "{msg.validation.total.cost.not.valid}")
+    @DecimalMin(value = "0.0", inclusive = false, message = "{msg.validation.total.cost.min}")
+    @DecimalMax(value = "10000.00", inclusive = false, message = "{msg.validation.total.cost.max}")
     private BigDecimal totalCost;
     @NotNull(message = "{msg.validation.order.status.empty}")
     private OrderStatus status;
-    @NotNull(message = "{msg.validation.order.detail.null}")
     @Valid
+    @NotNull(message = "{msg.validation.order.detail.null}")
     private List<OrderDetailDto> orderDetails = new ArrayList<>();
 
     public void addOrderDetailDto(OrderDetailDto detail) {

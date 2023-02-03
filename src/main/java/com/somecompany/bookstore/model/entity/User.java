@@ -23,14 +23,14 @@ import javax.persistence.Table;
 import java.io.Serializable;
 
 @Entity
-@NamedEntityGraph(name = "Person.withLogin", attributeNodes = @NamedAttributeNode("login"))
-@Table(name = "users")
-@AllArgsConstructor
-@NoArgsConstructor
-@EqualsAndHashCode
-@ToString
 @Getter
 @Setter
+@ToString
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "users")
+@NamedEntityGraph(name = "Person.withLogin", attributeNodes = @NamedAttributeNode("login"))
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,8 +43,8 @@ public class User implements Serializable {
     private String email;
     @Column(name = "phone_number")
     private String phoneNumber;
-    @Enumerated(EnumType.STRING)
     @Column(name = "user_role")
+    @Enumerated(EnumType.STRING)
     private Role role;
     @OneToOne(cascade = CascadeType.ALL)
     private Login login;

@@ -11,12 +11,12 @@ import javax.validation.constraints.Size;
 @Data
 public class LoginDto {
     private Long id;
-    @Pattern(regexp = RegExpConstant.USERNAME, message = "{msg.validation.username.not.valid}")
     @NotBlank(message = "{msg.validation.username.empty}")
+    @Pattern(regexp = RegExpConstant.USERNAME, message = "{msg.validation.username.not.valid}")
     private String username;
-    @Pattern(regexp = RegExpConstant.PASSWORD, message = "{msg.validation.password.not.valid}")
-    @Size(min = 8, message = "{msg.validation.password.length}")
-    @NotBlank(message = "{msg.validation.password.empty}")
     @ToString.Exclude
+    @NotBlank(message = "{msg.validation.password.empty}")
+    @Size(min = 8, message = "{msg.validation.password.length}")
+    @Pattern(regexp = RegExpConstant.PASSWORD, message = "{msg.validation.password.not.valid}")
     private String password;
 }

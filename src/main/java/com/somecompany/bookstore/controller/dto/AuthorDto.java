@@ -11,11 +11,11 @@ import java.time.LocalDate;
 @Data
 public class AuthorDto {
     private Long id;
-    @Pattern(regexp = RegExpConstant.NAME, message = "{msg.validation.first.name.not.valid}")
     @NotBlank(message = "{msg.validation.first.name.empty}")
+    @Pattern(regexp = RegExpConstant.NAME, message = "{msg.validation.first.name.not.valid}")
     private String firstName;
-    @Pattern(regexp = RegExpConstant.NAME, message = "{msg.validation.last.name.not.valid}")
     @NotBlank(message = "{msg.validation.last.name.empty}")
+    @Pattern(regexp = RegExpConstant.NAME, message = "{msg.validation.last.name.not.valid}")
     private String lastName;
     @NotNull(message = "{msg.validation.birthdate.empty}")
     private LocalDate birthdate;

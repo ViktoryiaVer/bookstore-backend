@@ -1,8 +1,8 @@
 package com.somecompany.bookstore.service;
 
-import com.somecompany.bookstore.exception.user.UserAlreadyExistsException;
-import com.somecompany.bookstore.exception.user.UserNotFoundException;
-import com.somecompany.bookstore.exception.user.UserServiceException;
+import com.somecompany.bookstore.exception.NotFoundException;
+import com.somecompany.bookstore.exception.ObjectAlreadyExistsException;
+import com.somecompany.bookstore.exception.ServiceException;
 import com.somecompany.bookstore.model.entity.User;
 import com.somecompany.bookstore.model.repository.OrderRepository;
 import com.somecompany.bookstore.model.repository.UserRepository;
@@ -17,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Objects;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
@@ -29,21 +29,18 @@ public class UserService {
     }
 
     public User getById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> {
-            throw new UserNotFoundException(messageSource.getMessage("msg.error.user.find.by.id", null,
-                    LocaleContextHolder.getLocale()));
-        });
+        return userRepository.findByIdOrException(userRepository, id);
     }
 
     @Transactional
     public User save(User user) {
         if (userRepository.existsByLoginUsername(user.getLogin().getUsername())) {
-            throw new UserAlreadyExistsException(messageSource.getMessage("msg.error.user.exists.username", null,
+            throw new ObjectAlreadyExistsException(messageSource.getMessage("msg.error.user.exists.username", null,
                     LocaleContextHolder.getLocale()));
         }
 
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new UserAlreadyExistsException(messageSource.getMessage("msg.error.user.exists.email", null,
+            throw new ObjectAlreadyExistsException(messageSource.getMessage("msg.error.user.exists.email", null,
                     LocaleContextHolder.getLocale()));
         }
         return userRepository.save(user);
@@ -52,7 +49,7 @@ public class UserService {
     @Transactional
     public User update(User user) {
         if (!userRepository.existsById(user.getId())) {
-            throw new UserServiceException(messageSource.getMessage("msg.error.user.update", null,
+            throw new ServiceException(messageSource.getMessage("msg.error.user.update", null,
                     LocaleContextHolder.getLocale()));
         }
 
@@ -60,12 +57,12 @@ public class UserService {
         Optional<User> existingUserByUserName = userRepository.findByLoginUsername(user.getLogin().getUsername());
 
         if (existingUserByUserName.isPresent() && !Objects.equals(existingUserByUserName.get().getId(), user.getId())) {
-            throw new UserAlreadyExistsException(messageSource.getMessage("msg.error.user.exists.username", null,
+            throw new ObjectAlreadyExistsException(messageSource.getMessage("msg.error.user.exists.username", null,
                     LocaleContextHolder.getLocale()));
         }
 
         if (existingUserByEmail.isPresent() && !Objects.equals(existingUserByEmail.get().getId(), user.getId())) {
-            throw new UserAlreadyExistsException(messageSource.getMessage("msg.error.user.exists.email", null,
+            throw new ObjectAlreadyExistsException(messageSource.getMessage("msg.error.user.exists.email", null,
                     LocaleContextHolder.getLocale()));
         }
         return userRepository.save(user);
@@ -74,19 +71,15 @@ public class UserService {
     @Transactional
     public void deleteById(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(messageSource.getMessage("msg.error.user.find.by.id", null,
+            throw new NotFoundException(messageSource.getMessage("msg.error.user.find.by.id", null,
                     LocaleContextHolder.getLocale()));
         }
 
         if (orderRepository.existsOrderByUserId(id)) {
-            throw new UserServiceException(messageSource.getMessage("msg.error.user.delete", null,
+            throw new ServiceException(messageSource.getMessage("msg.error.user.delete", null,
                     LocaleContextHolder.getLocale()));
         }
 
         userRepository.deleteById(id);
-    }
-
-    public boolean existsById(Long id) {
-        return userRepository.existsById(id);
     }
 }

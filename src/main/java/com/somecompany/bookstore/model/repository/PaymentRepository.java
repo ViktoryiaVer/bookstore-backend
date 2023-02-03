@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface PaymentRepository extends JpaRepository<Payment, Long> {
+public interface PaymentRepository extends JpaRepository<Payment, Long>, AbstractRepository {
     boolean existsPaymentByOrder(Order order);
 
     boolean existsByOrderIdAndUserId(Long orderId, Long userId);

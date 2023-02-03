@@ -22,22 +22,22 @@ import javax.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "payments")
-@AllArgsConstructor
-@NoArgsConstructor
-@EqualsAndHashCode
-@ToString
 @Getter
 @Setter
+@ToString
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "payments")
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "user_id")
-    private User user;
     @ManyToOne(cascade = CascadeType.REFRESH)
+    private User user;
     @JoinColumn(name = "order_id")
+    @ManyToOne(cascade = CascadeType.REFRESH)
     private Order order;
     @Column(name = "payment_time")
     private LocalDateTime paymentTime;

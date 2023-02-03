@@ -1,7 +1,7 @@
 package com.somecompany.bookstore.service;
 
-import com.somecompany.bookstore.exception.order.OrderNotFoundException;
-import com.somecompany.bookstore.exception.order.OrderServiceException;
+import com.somecompany.bookstore.exception.NotFoundException;
+import com.somecompany.bookstore.exception.ServiceException;
 import com.somecompany.bookstore.model.entity.Order;
 import com.somecompany.bookstore.model.entity.enums.OrderStatus;
 import com.somecompany.bookstore.model.repository.OrderRepository;
@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
@@ -28,25 +28,19 @@ public class OrderService {
     }
 
     public Order getById(Long id) {
-        return orderRepository.findById(id).orElseThrow(() -> {
-            throw new OrderNotFoundException(messageSource.getMessage("msg.error.order.find.by.id", null,
-                    LocaleContextHolder.getLocale()));
-        });
+        return orderRepository.findByIdOrException(orderRepository, id);
     }
 
     @Transactional
     public Order save(Order order) {
-        if (!OrderStatus.PENDING.equals(order.getStatus())) {
-            throw new OrderServiceException(messageSource.getMessage("msg.error.order.save", null,
-                    LocaleContextHolder.getLocale()));
-        }
+        order.setStatus(OrderStatus.PENDING);
         return orderRepository.save(order);
     }
 
     @Transactional
     public Order update(Order order) {
         if (!orderRepository.existsById(order.getId())) {
-            throw new OrderServiceException(messageSource.getMessage("msg.error.order.update", null,
+            throw new ServiceException(messageSource.getMessage("msg.error.order.update", null,
                     LocaleContextHolder.getLocale()));
         }
         return orderRepository.save(order);
@@ -56,24 +50,20 @@ public class OrderService {
     public void deleteById(Long id) {
         Optional<Order> existingOrder = orderRepository.findById(id);
         if (existingOrder.isEmpty()) {
-            throw new OrderNotFoundException(messageSource.getMessage("msg.error.order.find.by.id", null,
+            throw new NotFoundException(messageSource.getMessage("msg.error.order.find.by.id", null,
                     LocaleContextHolder.getLocale()));
         }
 
         if (!OrderStatus.CANCELED.equals(existingOrder.get().getStatus())) {
-            throw new OrderServiceException(messageSource.getMessage("msg.error.order.delete.status", null,
+            throw new ServiceException(messageSource.getMessage("msg.error.order.delete.status", null,
                     LocaleContextHolder.getLocale()));
         }
 
         if (paymentRepository.existsPaymentByOrder(existingOrder.get())) {
-            throw new OrderServiceException(messageSource.getMessage("msg.error.order.delete.payment", null,
+            throw new ServiceException(messageSource.getMessage("msg.error.order.delete.payment", null,
                     LocaleContextHolder.getLocale()));
         }
 
         orderRepository.deleteById(id);
-    }
-
-    public boolean existsById(Long id) {
-        return orderRepository.existsById(id);
     }
 }
