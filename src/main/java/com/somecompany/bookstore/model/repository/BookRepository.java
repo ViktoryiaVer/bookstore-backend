@@ -11,4 +11,6 @@ public interface BookRepository extends JpaRepository<Book, Long>, AbstractRepos
     boolean existsByTitle(String title);
 
     Optional<Book> findByTitle(String title);
+
+    boolean existsBookByAuthorsId(Long id);
 }
