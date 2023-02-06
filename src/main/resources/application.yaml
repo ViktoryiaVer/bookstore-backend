@@ -14,3 +14,11 @@ spring:
     open-in-view: true
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+
+bookstore:
+  app:
+    jwtSecret: bookstore
+    jwtExpirationMs: 300000
+
+
+
