@@ -28,7 +28,7 @@ public class OrderService {
     }
 
     public Order getById(Long id) {
-        return orderRepository.findByIdOrException(orderRepository, id);
+        return orderRepository.findByIdOrException(id);
     }
 
     @Transactional

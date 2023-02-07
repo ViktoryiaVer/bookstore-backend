@@ -28,7 +28,7 @@ public class PaymentService {
     }
 
     public Payment getById(Long id) {
-        return paymentRepository.findByIdOrException(paymentRepository, id);
+        return paymentRepository.findByIdOrException(id);
     }
 
     @Transactional

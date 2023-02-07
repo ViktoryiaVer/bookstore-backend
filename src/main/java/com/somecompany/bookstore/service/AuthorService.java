@@ -5,6 +5,7 @@ import com.somecompany.bookstore.exception.ObjectAlreadyExistsException;
 import com.somecompany.bookstore.exception.ServiceException;
 import com.somecompany.bookstore.model.entity.Author;
 import com.somecompany.bookstore.model.repository.AuthorRepository;
+import com.somecompany.bookstore.model.repository.BookRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -20,6 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthorService {
     private final AuthorRepository authorRepository;
+    private final BookRepository bookRepository;
     private final MessageSource messageSource;
 
     public Page<Author> getAll(Pageable pageable) {
@@ -27,7 +29,7 @@ public class AuthorService {
     }
 
     public Author getById(Long id) {
-        return authorRepository.findByIdOrException(authorRepository, id);
+        return authorRepository.findByIdOrException(id);
     }
 
     @Transactional
@@ -62,7 +64,7 @@ public class AuthorService {
                     LocaleContextHolder.getLocale()));
         }
 
-        if (authorRepository.checkIfAuthorHasABook(id)) {
+        if (bookRepository.existsBookByAuthorsId(id)) {
             throw new ServiceException(messageSource.getMessage("msg.error.author.delete", null,
                     LocaleContextHolder.getLocale()));
         }
