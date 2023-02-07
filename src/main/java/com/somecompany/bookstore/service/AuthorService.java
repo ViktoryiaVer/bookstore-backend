@@ -29,7 +29,7 @@ public class AuthorService {
     }
 
     public Author getById(Long id) {
-        return authorRepository.findByIdOrException(authorRepository, id);
+        return authorRepository.findByIdOrException(id);
     }
 
     @Transactional

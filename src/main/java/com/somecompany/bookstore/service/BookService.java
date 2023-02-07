@@ -29,7 +29,7 @@ public class BookService {
     }
 
     public Book getById(Long id) {
-        return bookRepository.findByIdOrException(bookRepository, id);
+        return bookRepository.findByIdOrException(id);
     }
 
     @Transactional

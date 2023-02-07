@@ -29,7 +29,7 @@ public class UserService {
     }
 
     public User getById(Long id) {
-        return userRepository.findByIdOrException(userRepository, id);
+        return userRepository.findByIdOrException(id);
     }
 
     @Transactional
