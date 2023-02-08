@@ -1,5 +1,6 @@
 package com.somecompany.bookstore.service;
 
+import com.somecompany.bookstore.aspect.logging.annotation.LogInvocation;
 import com.somecompany.bookstore.exception.NotFoundException;
 import com.somecompany.bookstore.exception.ObjectAlreadyExistsException;
 import com.somecompany.bookstore.exception.ServiceException;
@@ -24,14 +25,17 @@ public class UserService {
     private final OrderRepository orderRepository;
     private final MessageSource messageSource;
 
+    @LogInvocation
     public Page<User> getAll(Pageable pageable) {
         return userRepository.findAll(pageable);
     }
 
+    @LogInvocation
     public User getById(Long id) {
         return userRepository.findByIdOrException(id);
     }
 
+    @LogInvocation
     @Transactional
     public User save(User user) {
         if (userRepository.existsByLoginUsername(user.getLogin().getUsername())) {
@@ -46,6 +50,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @LogInvocation
     @Transactional
     public User update(User user) {
         if (!userRepository.existsById(user.getId())) {
@@ -68,6 +73,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @LogInvocation
     @Transactional
     public void deleteById(Long id) {
         if (!userRepository.existsById(id)) {

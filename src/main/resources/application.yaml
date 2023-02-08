@@ -20,5 +20,14 @@ bookstore:
     jwtSecret: bookstore
     jwtExpirationMs: 300000
 
-
-
+logging:
+  file:
+    path: logs
+  level:
+    root: info
+    org:
+      springframework:
+        web: info
+      hibernate: error
+    com:
+      bookstore: debug
