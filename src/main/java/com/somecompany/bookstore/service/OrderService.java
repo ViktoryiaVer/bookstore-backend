@@ -1,5 +1,6 @@
 package com.somecompany.bookstore.service;
 
+import com.somecompany.bookstore.aspect.logging.annotation.LogInvocation;
 import com.somecompany.bookstore.exception.NotFoundException;
 import com.somecompany.bookstore.exception.ServiceException;
 import com.somecompany.bookstore.model.entity.Order;
@@ -23,20 +24,24 @@ public class OrderService {
     private final PaymentRepository paymentRepository;
     private final MessageSource messageSource;
 
+    @LogInvocation
     public Page<Order> getAll(Pageable pageable) {
         return orderRepository.findAll(pageable);
     }
 
+    @LogInvocation
     public Order getById(Long id) {
         return orderRepository.findByIdOrException(id);
     }
 
+    @LogInvocation
     @Transactional
     public Order save(Order order) {
         order.setStatus(OrderStatus.PENDING);
         return orderRepository.save(order);
     }
 
+    @LogInvocation
     @Transactional
     public Order update(Order order) {
         if (!orderRepository.existsById(order.getId())) {
@@ -46,6 +51,7 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    @LogInvocation
     @Transactional
     public void deleteById(Long id) {
         Optional<Order> existingOrder = orderRepository.findById(id);
