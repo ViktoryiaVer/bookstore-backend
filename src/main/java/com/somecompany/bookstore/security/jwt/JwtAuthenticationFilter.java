@@ -21,6 +21,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -28,6 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtil;
     private final UserDetailsService userDetailsService;
     private final MessageSource messageSource;
+    private static final List<String> NON_FILTERED_URLS = new ArrayList<>(List.of("/api/auth/login", "/api/auth/signup",
+            "/swagger-ui", "/v3/api-docs"));
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -54,8 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
-        return path.startsWith("/api/auth/login") || path.startsWith("/api/auth/signup")
-                || path.contains("/swagger-ui") || path.startsWith("/v3/api-docs");
+        return NON_FILTERED_URLS.stream().anyMatch(path::contains);
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {
