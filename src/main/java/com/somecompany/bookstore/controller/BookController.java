@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,28 +32,33 @@ public class BookController {
     private final BookCreateMapper writeMapper;
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<List<BookDto>> getAllBooks(Pageable pageable) {
         return ResponseEntity.ok(bookService.getAll(pageable).stream().map(mapper::toDto).toList());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<BookDto> getBook(@PathVariable Long id) {
         return ResponseEntity.ok(mapper.toDto(bookService.getById(id)));
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<BookDto> createBook(@Valid @RequestBody BookCreateDto book) {
         BookDto savedBook = mapper.toDto(bookService.save(writeMapper.toEntity(book)));
         return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
     }
 
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<BookDto> updateBook(@Valid @RequestBody BookCreateDto book) {
         BookDto updatedBook = mapper.toDto(bookService.update(writeMapper.toEntity(book)));
         return ResponseEntity.ok(updatedBook);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<BookDto> deleteBook(@PathVariable Long id) {
         bookService.deleteById(id);
         return ResponseEntity.status(HttpStatus.RESET_CONTENT).build();

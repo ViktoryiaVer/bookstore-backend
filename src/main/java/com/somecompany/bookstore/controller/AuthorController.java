@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,28 +28,33 @@ public class AuthorController {
     private final AuthorMapper mapper;
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<List<AuthorDto>> getAllAuthors(Pageable pageable) {
         return ResponseEntity.ok(authorService.getAll(pageable).stream().map(mapper::toDto).toList());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<AuthorDto> getAuthor(@PathVariable Long id) {
         return ResponseEntity.ok(mapper.toDto(authorService.getById(id)));
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<AuthorDto> createAuthor(@Valid @RequestBody AuthorDto author) {
         AuthorDto savedAuthor = mapper.toDto(authorService.save(mapper.toEntity(author)));
         return ResponseEntity.status(HttpStatus.CREATED).body(savedAuthor);
     }
 
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<AuthorDto> updateAuthor(@Valid @RequestBody AuthorDto author) {
         AuthorDto updatedAuthor = mapper.toDto(authorService.update(mapper.toEntity(author)));
         return ResponseEntity.ok(updatedAuthor);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<AuthorDto> deleteAuthor(@PathVariable Long id) {
         authorService.deleteById(id);
         return ResponseEntity.status(HttpStatus.RESET_CONTENT).build();
