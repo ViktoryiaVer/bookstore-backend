@@ -6,7 +6,6 @@ import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
@@ -17,12 +16,7 @@ import org.springframework.util.StopWatch;
 public class ServiceLoggingAspect {
     private final ObjectMapper mapper;
 
-    @Pointcut("within(com.somecompany.bookstore.service.*) " +
-            "&& @annotation(com.somecompany.bookstore.aspect.logging.annotation.LogInvocation)")
-    public void pointcut() {
-    }
-
-    @Around("pointcut()")
+    @Around("@annotation(com.somecompany.bookstore.aspect.logging.annotation.LogInvocation)")
     public Object logMethod(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
@@ -35,8 +29,8 @@ public class ServiceLoggingAspect {
 
         stopWatch.stop();
 
-        log.info("Calling service method " + methodName + " of class " + className + " with arguments: " + mapper.writeValueAsString(args) +
-                ". Execution time in milliseconds: " + stopWatch.getTotalTimeMillis());
+        log.info("Calling service method {} of class {} with arguments: {}. Execution time in milliseconds: {}",
+                methodName, className, mapper.writeValueAsString(args), stopWatch.getTotalTimeMillis());
         return proceed;
     }
 }

@@ -21,8 +21,6 @@ bookstore:
     jwtExpirationMs: 300000
 
 logging:
-  file:
-    path: logs
   level:
     root: info
     org:
