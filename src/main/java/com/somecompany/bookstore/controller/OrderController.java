@@ -6,6 +6,7 @@ import com.somecompany.bookstore.controller.dto.OrderDto;
 import com.somecompany.bookstore.mapper.OrderCreateMapper;
 import com.somecompany.bookstore.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
@@ -33,7 +34,7 @@ public class OrderController {
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
-    public ResponseEntity<List<OrderDto>> getAllOrders(Pageable pageable) {
+    public ResponseEntity<List<OrderDto>> getAllOrders(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(orderService.getAll(pageable).stream().map(mapper::toDto).toList());
     }
 

@@ -6,6 +6,7 @@ import com.somecompany.bookstore.mapper.BookCreateMapper;
 import com.somecompany.bookstore.controller.dto.BookDto;
 import com.somecompany.bookstore.service.BookService;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
@@ -33,7 +34,7 @@ public class BookController {
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
-    public ResponseEntity<List<BookDto>> getAllBooks(Pageable pageable) {
+    public ResponseEntity<List<BookDto>> getAllBooks(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(bookService.getAll(pageable).stream().map(mapper::toDto).toList());
     }
 

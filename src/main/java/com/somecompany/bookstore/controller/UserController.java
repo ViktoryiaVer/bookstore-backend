@@ -4,6 +4,7 @@ import com.somecompany.bookstore.mapper.UserMapper;
 import com.somecompany.bookstore.service.UserService;
 import com.somecompany.bookstore.controller.dto.UserDto;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
-    public ResponseEntity<List<UserDto>> getAllUsers(Pageable pageable) {
+    public ResponseEntity<List<UserDto>> getAllUsers(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(userService.getAll(pageable).stream().map(mapper::toDto).toList());
     }
 

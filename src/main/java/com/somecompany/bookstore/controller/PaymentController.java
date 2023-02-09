@@ -6,6 +6,7 @@ import com.somecompany.bookstore.mapper.PaymentMapper;
 import com.somecompany.bookstore.controller.dto.PaymentDto;
 import com.somecompany.bookstore.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class PaymentController {
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
-    public ResponseEntity<List<PaymentDto>> getAllPayments(Pageable pageable) {
+    public ResponseEntity<List<PaymentDto>> getAllPayments(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(paymentService.getAll(pageable).stream().map(mapper::toDto).toList());
     }
 
