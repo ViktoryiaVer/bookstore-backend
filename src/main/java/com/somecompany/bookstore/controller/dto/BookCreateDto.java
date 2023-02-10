@@ -49,7 +49,7 @@ public class BookCreateDto {
     @NotNull(message = "{msg.validation.cover.empty}")
     private Cover cover;
 
-    @Schema(description = "Book author id")
+    @Schema(description = "Book author id", example = "1")
     @NotNull(message = "{msg.validation.authors.id.null}")
     @ObjectExistsValidation(repository = AuthorRepository.class, message = "{msg.error.author.find.by.id}")
     private List<Long> authorIds;

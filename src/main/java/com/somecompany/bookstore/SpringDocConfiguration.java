@@ -23,7 +23,7 @@ public class SpringDocConfiguration {
                         .description("Bookstore API project with basic CRUD methods")
                         .contact(new Contact().name("Victoria V").email("test@gmail.com"))
                         .version("1.0"))
-                .servers(List.of(new Server().url("http://localhost:8080").description("Local hosting")))
+                .servers(List.of(new Server().url("/").description("Local hosting")))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components().addSecuritySchemes(securitySchemeName, new SecurityScheme()
                                 .name(securitySchemeName)

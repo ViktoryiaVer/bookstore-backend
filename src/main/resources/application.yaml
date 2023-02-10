@@ -14,21 +14,8 @@ spring:
     open-in-view: true
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
-  mvc:
-    path match:
-      matching-strategy: ant_path_matcher
 
 bookstore:
   app:
     jwtSecret: bookstore
     jwtExpirationMs: 300000
-
-logging:
-  level:
-    root: info
-    org:
-      springframework:
-        web: info
-      hibernate: error
-    com:
-      bookstore: debug
