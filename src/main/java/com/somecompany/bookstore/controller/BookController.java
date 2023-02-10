@@ -1,11 +1,22 @@
 package com.somecompany.bookstore.controller;
 
 import com.somecompany.bookstore.controller.dto.BookCreateDto;
+import com.somecompany.bookstore.controller.dto.response.MessageDto;
+import com.somecompany.bookstore.controller.dto.response.ValidationResultDto;
 import com.somecompany.bookstore.mapper.BookMapper;
 import com.somecompany.bookstore.mapper.BookCreateMapper;
 import com.somecompany.bookstore.controller.dto.BookDto;
 import com.somecompany.bookstore.service.BookService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
@@ -26,40 +37,118 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/books/")
+@Tag(name = "books", description = "operations with books")
 public class BookController {
     private final BookService bookService;
     private final BookMapper mapper;
     private final BookCreateMapper writeMapper;
 
     @GetMapping
+    @Operation(summary = "Get all books (paginated result)")
     @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
-    public ResponseEntity<List<BookDto>> getAllBooks(Pageable pageable) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found the books",
+                    content = {@Content(mediaType = "application/json", array = @ArraySchema(
+                            schema = @Schema(implementation = BookDto.class)))}),
+            @ApiResponse(responseCode = "400", description = "Invalid pageable object supplied",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageDto.class))}),
+            @ApiResponse(responseCode = "401", description = "Error by authentication",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageDto.class))})})
+    public ResponseEntity<List<BookDto>> getAllBooks(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(bookService.getAll(pageable).stream().map(mapper::toDto).toList());
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get a book by its id")
     @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
-    public ResponseEntity<BookDto> getBook(@PathVariable Long id) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found the book",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BookDto.class))}),
+            @ApiResponse(responseCode = "400", description = "Invalid id supplied",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageDto.class))}),
+            @ApiResponse(responseCode = "401", description = "Error by authentication",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageDto.class))}),
+            @ApiResponse(responseCode = "404", description = "Book not found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageDto.class))})})
+    public ResponseEntity<BookDto> getBook(@Parameter(description = "Id of the book to be found",
+            required = true) @PathVariable Long id) {
         return ResponseEntity.ok(mapper.toDto(bookService.getById(id)));
     }
 
     @PostMapping
+    @Operation(summary = "Create a book")
     @PreAuthorize("hasAuthority('ADMIN')")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Book is created",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BookDto.class))}),
+            @ApiResponse(responseCode = "400", description = "Some of the book properties are not valid",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ValidationResultDto.class))}),
+            @ApiResponse(responseCode = "401", description = "Error by authentication",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageDto.class))}),
+            @ApiResponse(responseCode = "403", description = "Access denied: user has no authority for creating a book",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageDto.class))}),
+            @ApiResponse(responseCode = "500", description = "Server error by creating a book",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageDto.class))})})
     public ResponseEntity<BookDto> createBook(@Valid @RequestBody BookCreateDto book) {
         BookDto savedBook = mapper.toDto(bookService.save(writeMapper.toEntity(book)));
         return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
     }
 
     @PutMapping
+    @Operation(summary = "Update a book")
     @PreAuthorize("hasAuthority('ADMIN')")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Book is updated",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BookDto.class))}),
+            @ApiResponse(responseCode = "400", description = "Some of the book properties are not valid",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ValidationResultDto.class))}),
+            @ApiResponse(responseCode = "401", description = "Error by authentication",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageDto.class))}),
+            @ApiResponse(responseCode = "403", description = "Access denied: user has no authority for updating a book",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageDto.class))}),
+            @ApiResponse(responseCode = "500", description = "Server error by updating a book",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageDto.class))})})
     public ResponseEntity<BookDto> updateBook(@Valid @RequestBody BookCreateDto book) {
         BookDto updatedBook = mapper.toDto(bookService.update(writeMapper.toEntity(book)));
         return ResponseEntity.ok(updatedBook);
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a book")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<BookDto> deleteBook(@PathVariable Long id) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "205", description = "Book is deleted",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid id supplied",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageDto.class))}),
+            @ApiResponse(responseCode = "401", description = "Error by authentication",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageDto.class))}),
+            @ApiResponse(responseCode = "403", description = "Access denied: user has no authority for deleting a book",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageDto.class))}),
+            @ApiResponse(responseCode = "404", description = "Book not found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageDto.class))})})
+    public ResponseEntity<BookDto> deleteBook(@Parameter(description = "Id of the book to be deleted",
+            required = true) @PathVariable Long id) {
         bookService.deleteById(id);
         return ResponseEntity.status(HttpStatus.RESET_CONTENT).build();
     }

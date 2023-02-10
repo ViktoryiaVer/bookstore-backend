@@ -53,6 +53,7 @@ public class SecurityConfiguration {
                 .mvcMatcher("/api/auth/login/**").httpBasic().authenticationEntryPoint(entryPoint).and()
                 .authorizeRequests()
                 .mvcMatchers(HttpMethod.POST, "/api/auth/login/**", "/api/auth/signup/**").permitAll()
+                .mvcMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs").permitAll()
                 .mvcMatchers(HttpMethod.GET, "/api/users/**", "/api/books/**", "/api/authors/**", "/api/orders/**", "/api/payments/**").authenticated()
                 .mvcMatchers(HttpMethod.POST, "/api/users/**", "/api/books/**", "/api/authors/**", "/api/orders/**", "/api/payments/**").authenticated()
                 .mvcMatchers(HttpMethod.PUT, "/api//users/**", "/api/books/**", "/api/authors/**", "/api/orders/**", "/api/payments/**").authenticated()
