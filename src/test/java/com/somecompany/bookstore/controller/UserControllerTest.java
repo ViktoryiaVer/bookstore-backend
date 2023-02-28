@@ -139,7 +139,7 @@ class UserControllerTest {
         when(userService.save(userWithoutId)).thenReturn(userWithId);
         when(userMapper.toDto(userWithId)).thenReturn(userDtoWithId);
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/users/" ).with(csrf())
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/users/").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(userDtoWithoutId)))
                 .andDo(print())
@@ -159,7 +159,7 @@ class UserControllerTest {
         userDtoWithoutId.setFirstName("12345");
         when(userMapper.toEntity(userDtoWithoutId)).thenReturn(userWithoutId);
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/users/" ).with(csrf())
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/users/").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(userDtoWithoutId)))
                 .andDo(print())
@@ -179,9 +179,9 @@ class UserControllerTest {
         when(userMapper.toEntity(userDtoWithoutId)).thenReturn(userWithoutId);
         when(userService.save(userWithoutId)).thenThrow(ObjectAlreadyExistsException.class);
 
-        this.mockMvc.perform(post("/api/users/" ).with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(userDtoWithoutId)))
+        this.mockMvc.perform(post("/api/users/").with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(userDtoWithoutId)))
                 .andDo(print())
                 .andExpectAll(status().isInternalServerError(),
                         content().contentType(MediaType.APPLICATION_JSON));
@@ -201,7 +201,7 @@ class UserControllerTest {
         when(userService.update(userWithId)).thenReturn(userWithId);
         when(userMapper.toDto(userWithId)).thenReturn(userDtoWithId);
 
-        MvcResult mvcResult = this.mockMvc.perform(put("/api/users/" ).with(csrf())
+        MvcResult mvcResult = this.mockMvc.perform(put("/api/users/").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(userDtoWithId)))
                 .andDo(print())
@@ -223,7 +223,7 @@ class UserControllerTest {
 
         when(userMapper.toEntity(userDtoWithId)).thenReturn(userWithId);
 
-        MvcResult mvcResult = this.mockMvc.perform(put("/api/users/" ).with(csrf())
+        MvcResult mvcResult = this.mockMvc.perform(put("/api/users/").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(userDtoWithId)))
                 .andDo(print())
@@ -243,7 +243,7 @@ class UserControllerTest {
         when(userMapper.toEntity(userDtoWithId)).thenReturn(userWithId);
         when(userService.update(userWithId)).thenThrow(ObjectAlreadyExistsException.class);
 
-        this.mockMvc.perform(put("/api/users/" ).with(csrf())
+        this.mockMvc.perform(put("/api/users/").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(userDtoWithId)))
                 .andDo(print())

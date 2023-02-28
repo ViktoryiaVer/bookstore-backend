@@ -162,7 +162,7 @@ class BookControllerTest {
         when(bookMapper.toDto(bookWithId)).thenReturn(bookDtoToRead);
         when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/books/" ).with(csrf())
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/books/").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToSave)))
                 .andDo(print())
@@ -182,7 +182,7 @@ class BookControllerTest {
         bookDtoToSave.setPrice(BigDecimal.ZERO);
         when(bookCreateMapper.toEntity(bookDtoToSave)).thenReturn(bookWithoutId);
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/books/" ).with(csrf())
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/books/").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToSave)))
                 .andDo(print())
@@ -203,9 +203,9 @@ class BookControllerTest {
         when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
         when(bookService.save(bookWithoutId)).thenThrow(ObjectAlreadyExistsException.class);
 
-        this.mockMvc.perform(post("/api/books/" ).with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(bookDtoToSave)))
+        this.mockMvc.perform(post("/api/books/").with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(bookDtoToSave)))
                 .andDo(print())
                 .andExpectAll(status().isInternalServerError(),
                         content().contentType(MediaType.APPLICATION_JSON));
@@ -228,7 +228,7 @@ class BookControllerTest {
         when(bookMapper.toDto(bookWithId)).thenReturn(bookDtoToRead);
 
 
-        MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/books/" ).with(csrf())
+        MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/books/").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToUpdate)))
                 .andDo(print())
@@ -252,7 +252,7 @@ class BookControllerTest {
         when(bookCreateMapper.toEntity(bookDtoToSave)).thenReturn(bookWithId);
         when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
 
-        MvcResult mvcResult = this.mockMvc.perform(put("/api/books/" ).with(csrf())
+        MvcResult mvcResult = this.mockMvc.perform(put("/api/books/").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToUpdate)))
                 .andDo(print())
@@ -273,7 +273,7 @@ class BookControllerTest {
         when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
         when(bookService.update(bookWithId)).thenThrow(ObjectAlreadyExistsException.class);
 
-        this.mockMvc.perform(put("/api/books/" ).with(csrf())
+        this.mockMvc.perform(put("/api/books/").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToUpdate)))
                 .andDo(print())
