@@ -37,9 +37,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String jwtToken = getTokenFromRequest(request);
-            String username = jwtUtil.extractUsername(jwtToken);
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (jwtToken != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                String username = jwtUtil.extractUsername(jwtToken);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 if (jwtUtil.validateToken(jwtToken, userDetails)) {
@@ -66,10 +66,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
-        } else {
+        } else if (SecurityContextHolder.getContext().getAuthentication() == null) {
             throw new MissingTokenException(messageSource.getMessage("msg.token.missing", null,
                     LocaleContextHolder.getLocale()));
         }
+        return null;
     }
 
     private void setAuthentication(HttpServletRequest request, UserDetails userDetails) {
