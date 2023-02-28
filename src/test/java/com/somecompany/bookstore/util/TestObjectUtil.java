@@ -1,6 +1,7 @@
 package com.somecompany.bookstore.util;
 
 import com.somecompany.bookstore.controller.dto.AuthorDto;
+import com.somecompany.bookstore.controller.dto.BookCreateDto;
 import com.somecompany.bookstore.controller.dto.BookDto;
 import com.somecompany.bookstore.controller.dto.LoginDto;
 import com.somecompany.bookstore.controller.dto.UserDto;
@@ -12,6 +13,8 @@ import com.somecompany.bookstore.model.entity.enums.Cover;
 import com.somecompany.bookstore.model.entity.enums.Role;
 import com.somecompany.bookstore.util.constant.TestObjectConstant;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +40,24 @@ public class TestObjectUtil {
         User user = getUserWithoutId();
         user.setId(TestObjectConstant.USER_ID);
         user.getLogin().setId(TestObjectConstant.LOGIN_ID);
+        return user;
+    }
+
+    public static User getExistingUserInDb() {
+        User user = new User();
+        user.setId(17L);
+        user.setFirstName("Reader");
+        user.setLastName("Reader");
+        user.setEmail("reader@mail.ru");
+        user.setPhoneNumber("+3758888888");
+        user.setRole(Role.USER);
+
+        Login login = new Login();
+        login.setId(17L);
+        login.setUsername("reader");
+        login.setPassword("reader");
+
+        user.setLogin(login);
         return user;
     }
 
@@ -82,8 +103,46 @@ public class TestObjectUtil {
         return book;
     }
 
-    public static BookDto getBookDtoWithoutId() {
+    public static Book getExistingBook() {
+        Book book = new Book();
+        book.setId(17L);
+        book.setTitle("The Magic Mountain");
+        book.setPublisher("VINTAGE");
+        book.setIsbn("0749386428");
+        book.setYearOfPublication(1996);
+        book.setPrice(BigDecimal.valueOf(40.23));
+        book.setCover(Cover.HARD);
+
+        Author author = new Author();
+        author.setId(14L);
+        author.setFirstName("Thomas");
+        author.setLastName("Mann");
+        author.setBirthdate(LocalDate.of(1875, 6, 6));
+        book.setAuthors(new ArrayList<>(List.of(author)));
+        return book;
+    }
+
+    public static BookCreateDto getBookDtoToSave() {
+        BookCreateDto book = new BookCreateDto();
+        book.setTitle(TestObjectConstant.BOOK_TITLE);
+        book.setPublisher(TestObjectConstant.BOOK_PUBLISHER);
+        book.setIsbn(TestObjectConstant.BOOK_ISBN);
+        book.setYearOfPublication(TestObjectConstant.BOOK_PUBLICATION_YEAR);
+        book.setPrice(TestObjectConstant.BOOK_PRICE);
+        book.setCover(Cover.valueOf(TestObjectConstant.BOOK_COVER));
+        book.setAuthorIds(new ArrayList<>(List.of(TestObjectConstant.AUTHOR_ID)));
+        return book;
+    }
+
+    public static BookCreateDto getBookDtoToUpdate() {
+        BookCreateDto book = getBookDtoToSave();
+        book.setId(TestObjectConstant.BOOK_ID);
+        return book;
+    }
+
+    public static BookDto getBookDtoToRead() {
         BookDto book = new BookDto();
+        book.setId(TestObjectConstant.USER_ID);
         book.setTitle(TestObjectConstant.BOOK_TITLE);
         book.setPublisher(TestObjectConstant.BOOK_PUBLISHER);
         book.setIsbn(TestObjectConstant.BOOK_ISBN);
@@ -91,12 +150,6 @@ public class TestObjectUtil {
         book.setPrice(TestObjectConstant.BOOK_PRICE);
         book.setCover(Cover.valueOf(TestObjectConstant.BOOK_COVER));
         book.setAuthors(new ArrayList<>(List.of(getAuthorDto())));
-        return book;
-    }
-
-    public static BookDto getBookDtoWithId() {
-        BookDto book = getBookDtoWithId();
-        book.setId(TestObjectConstant.USER_ID);
         return book;
     }
 
