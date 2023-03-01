@@ -30,7 +30,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
@@ -50,7 +49,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -80,8 +78,6 @@ class BookControllerTest {
     @MockBean
     private UserDetailsService userDetailsService;
     @MockBean
-    private UserDetails userDetails;
-    @MockBean
     private CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint;
     private BookCreateDto bookDtoToSave;
     private BookCreateDto bookDtoToUpdate;
@@ -99,7 +95,7 @@ class BookControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "USER")
     void whenRequestAllBooks_thenReturnOkAndAllBooks() throws Exception {
         Pageable pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
         Page<Book> bookPage = new PageImpl<>(TestObjectUtil.getBookList());
@@ -122,7 +118,7 @@ class BookControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "USER")
     void whenRequestExistingBook_thenReturnOkAndBook() throws Exception {
         Long bookId = bookWithId.getId();
         when(bookService.getById(bookId)).thenReturn(bookWithId);
@@ -140,7 +136,7 @@ class BookControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "USER")
     void whenRequestNonExistingBook_thenReturn404() throws Exception {
         Long bookId = 100L;
         when(bookService.getById(bookId)).thenThrow(NotFoundException.class);
@@ -155,14 +151,14 @@ class BookControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "ADMIN")
     void givenCorrectData_whenRequestBookCreation_thenReturnStatusCreatedAndSavedBook() throws Exception {
         when(bookCreateMapper.toEntity(bookDtoToSave)).thenReturn(bookWithoutId);
         when(bookService.save(bookWithoutId)).thenReturn(bookWithId);
         when(bookMapper.toDto(bookWithId)).thenReturn(bookDtoToRead);
         when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/books/").with(csrf())
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/books/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToSave)))
                 .andDo(print())
@@ -177,12 +173,29 @@ class BookControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "USER")
+    void givenUserWithInsufficientRights_whenRequestBookCreation_thenReturn403() throws Exception {
+        when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
+
+        this.mockMvc.perform(post("/api/books/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(bookDtoToSave)))
+                .andDo(print())
+                .andExpectAll(status().isForbidden(), content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        verify(bookService, never()).save(bookWithoutId);
+        verify(bookMapper, never()).toDto(bookWithId);
+        verify(bookCreateMapper, never()).toEntity(bookDtoToSave);
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
     void givenIncorrectData_whenRequestBookCreation_thenReturnStatus400AndErrors() throws Exception {
         bookDtoToSave.setPrice(BigDecimal.ZERO);
         when(bookCreateMapper.toEntity(bookDtoToSave)).thenReturn(bookWithoutId);
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/books/").with(csrf())
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/books/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToSave)))
                 .andDo(print())
@@ -197,13 +210,13 @@ class BookControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "ADMIN")
     void whenRequestBookCreationWithExistingData_thenReturn500() throws Exception {
         when(bookCreateMapper.toEntity(bookDtoToSave)).thenReturn(bookWithoutId);
         when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
         when(bookService.save(bookWithoutId)).thenThrow(ObjectAlreadyExistsException.class);
 
-        this.mockMvc.perform(post("/api/books/").with(csrf())
+        this.mockMvc.perform(post("/api/books/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToSave)))
                 .andDo(print())
@@ -216,7 +229,7 @@ class BookControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "ADMIN")
     void givenCorrectData_whenRequestBookUpdate_thenReturnStatusOkAndUpdatedBook() throws Exception {
         bookWithId.setTitle("Test-Upd");
         bookDtoToUpdate.setTitle("Test-Upd");
@@ -228,7 +241,7 @@ class BookControllerTest {
         when(bookMapper.toDto(bookWithId)).thenReturn(bookDtoToRead);
 
 
-        MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/books/").with(csrf())
+        MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/books/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToUpdate)))
                 .andDo(print())
@@ -243,7 +256,24 @@ class BookControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "USER")
+    void givenUserWithInsufficientRights_whenRequestBookUpdate_thenReturn403() throws Exception {
+        when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
+
+        this.mockMvc.perform(put("/api/books/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(bookDtoToUpdate)))
+                .andDo(print())
+                .andExpectAll(status().isForbidden(), content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        verify(bookService, never()).update(bookWithoutId);
+        verify(bookMapper, never()).toDto(bookWithId);
+        verify(bookCreateMapper, never()).toEntity(bookDtoToUpdate);
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
     void givenIncorrectData_whenRequestBookUpdate_thenReturnStatus400AndErrors() throws Exception {
         bookWithId.setPrice(BigDecimal.ZERO);
         bookDtoToUpdate.setPrice(BigDecimal.ZERO);
@@ -252,7 +282,7 @@ class BookControllerTest {
         when(bookCreateMapper.toEntity(bookDtoToSave)).thenReturn(bookWithId);
         when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
 
-        MvcResult mvcResult = this.mockMvc.perform(put("/api/books/").with(csrf())
+        MvcResult mvcResult = this.mockMvc.perform(put("/api/books/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToUpdate)))
                 .andDo(print())
@@ -267,13 +297,13 @@ class BookControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "ADMIN")
     void whenRequestBookUpdateWithExistingDataAndAnotherId_thenReturn500() throws Exception {
         when(bookCreateMapper.toEntity(bookDtoToUpdate)).thenReturn(bookWithId);
         when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
         when(bookService.update(bookWithId)).thenThrow(ObjectAlreadyExistsException.class);
 
-        this.mockMvc.perform(put("/api/books/").with(csrf())
+        this.mockMvc.perform(put("/api/books/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToUpdate)))
                 .andDo(print())
@@ -286,12 +316,12 @@ class BookControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "ADMIN")
     void givenCorrectExistingId_whenRequestBookDelete_thenReturn205AndNoContent() throws Exception {
         Long bookId = bookWithId.getId();
         doNothing().when(bookService).deleteById(bookId);
 
-        this.mockMvc.perform(delete("/api/books/" + bookId).with(csrf()))
+        this.mockMvc.perform(delete("/api/books/" + bookId))
                 .andDo(print())
                 .andExpectAll(status().isResetContent(), jsonPath("$").doesNotExist());
 
@@ -299,11 +329,27 @@ class BookControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "USER")
+    void givenUserWithInsufficientRights_whenRequestBookDelete_thenReturn403() throws Exception {
+        Long bookId = bookWithId.getId();
+        when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
+
+        this.mockMvc.perform(delete("/api/books/" + bookId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(bookDtoToUpdate)))
+                .andDo(print())
+                .andExpectAll(status().isForbidden(), content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        verify(bookService, never()).deleteById(bookId);
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
     void givenIdOfInvalidType_whenRequestBookDelete_thenReturn205BadRequest() throws Exception {
         String invalidString = "asf";
 
-        this.mockMvc.perform(delete("/api/books/" + invalidString).with(csrf()))
+        this.mockMvc.perform(delete("/api/books/" + invalidString))
                 .andDo(print())
                 .andExpectAll(status().isBadRequest(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -313,12 +359,12 @@ class BookControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "ADMIN")
     void whenRequestBookDeleteForNonExistingId_thenReturn205BadRequest() throws Exception {
         Long bookId = 100L;
         doThrow(NotFoundException.class).when(bookService).deleteById(bookId);
 
-        this.mockMvc.perform(delete("/api/books/" + bookId).with(csrf()))
+        this.mockMvc.perform(delete("/api/books/" + bookId))
                 .andDo(print())
                 .andExpectAll(status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON));
@@ -327,12 +373,12 @@ class BookControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "ADMIN")
     void whenRequestBookDeleteForUserWithOrders_thenReturn500() throws Exception {
         Long bookId = bookWithId.getId();
         doThrow(ServiceException.class).when(bookService).deleteById(bookId);
 
-        this.mockMvc.perform(delete("/api/books/" + bookId).with(csrf()))
+        this.mockMvc.perform(delete("/api/books/" + bookId))
                 .andDo(print())
                 .andExpectAll(status().isInternalServerError(),
                         content().contentType(MediaType.APPLICATION_JSON));
