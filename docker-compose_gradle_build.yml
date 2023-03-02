@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:14.5
+    container_name: db
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: bookstore
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - bookstore-gradle-network
+  bookstore-app_gradle:
+    container_name: bookstore-app_gradle
+    image: bookstore-app-gradle:1.0
+    build:
+      context: .
+      dockerfile: bookstore-app_gradle_build.dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - bookstore-gradle-network
+networks:
+  bookstore-gradle-network:
+    driver: bridge
