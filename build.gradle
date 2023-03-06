@@ -50,3 +50,7 @@ tasks.named('test') {
 compileJava {
     options.compilerArgs = ['-Amapstruct.defaultComponentModel=spring']
 }
+
+bootJar {
+    archiveFileName = 'bookstore-app.jar'
+}

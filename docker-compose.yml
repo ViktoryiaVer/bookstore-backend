@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:14.5
+    container_name: db
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: bookstore
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - bookstore-network
+  bookstore-app:
+    container_name: bookstore-app
+    image: bookstore-app:1.0
+    build:
+      context: .
+      dockerfile: bookstore-app.dockerfile
+    ports:
+      - "8082:8080"
+    depends_on:
+      - db
+    networks:
+      - bookstore-network
+    environment:
+      - "SPRING_PROFILES_ACTIVE=prod"
+networks:
+  bookstore-network:
+    driver: bridge
