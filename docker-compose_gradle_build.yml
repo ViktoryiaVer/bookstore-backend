@@ -25,6 +25,8 @@ services:
       - db
     networks:
       - bookstore-gradle-network
+    environment:
+      - "SPRING_PROFILES_ACTIVE=prod"
 networks:
   bookstore-gradle-network:
     driver: bridge

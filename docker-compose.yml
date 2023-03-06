@@ -25,6 +25,8 @@ services:
       - db
     networks:
       - bookstore-network
+    environment:
+      - "SPRING_PROFILES_ACTIVE=prod"
 networks:
   bookstore-network:
     driver: bridge
