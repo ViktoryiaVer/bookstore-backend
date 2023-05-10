@@ -60,7 +60,7 @@ public class AuthenticationController {
             String jwt = jwtUtils.generateToken((UserDetails) authentication.getPrincipal());
             return ResponseEntity.ok(new TokenDto(jwt));
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageDto(messageSource.getMessage("msg.login.error", null,
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageDto(messageSource.getMessage("msg.error.login", null,
                     LocaleContextHolder.getLocale())));
         }
     }
