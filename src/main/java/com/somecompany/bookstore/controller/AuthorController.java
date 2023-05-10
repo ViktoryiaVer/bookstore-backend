@@ -4,6 +4,7 @@ import com.somecompany.bookstore.controller.dto.response.MessageDto;
 import com.somecompany.bookstore.controller.dto.response.ValidationResultDto;
 import com.somecompany.bookstore.mapper.AuthorMapper;
 import com.somecompany.bookstore.controller.dto.AuthorDto;
+import com.somecompany.bookstore.model.entity.Author;
 import com.somecompany.bookstore.service.AuthorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +31,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,7 +41,6 @@ import java.util.List;
 public class AuthorController {
     private final AuthorService authorService;
     private final AuthorMapper mapper;
-
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     @Operation(summary = "Get all authors (paginated result)")
@@ -52,8 +54,14 @@ public class AuthorController {
             @ApiResponse(responseCode = "401", description = "Error by authentication",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))})})
-    public ResponseEntity<List<AuthorDto>> getAllAuthors(@ParameterObject Pageable pageable) {
-        return ResponseEntity.ok(authorService.getAll(pageable).stream().map(mapper::toDto).toList());
+    public ResponseEntity<Map<String, Object>> getAllAuthors(@ParameterObject Pageable pageable) {
+        Page<Author> authorPage = authorService.getAll(pageable);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("authors", authorPage.getContent().stream().map(mapper::toDto).toList());
+        response.put("pageable", authorPage.getPageable());
+        response.put("totalPages", authorPage.getTotalPages());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
