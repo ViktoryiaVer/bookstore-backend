@@ -33,6 +33,7 @@ public class OrderDetail implements Serializable {
     private Long id;
     @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "order_id", referencedColumnName = "id")
+    @ToString.Exclude
     private Order order;
     @JoinColumn(name = "book_id")
     @ManyToOne(cascade = CascadeType.REFRESH)

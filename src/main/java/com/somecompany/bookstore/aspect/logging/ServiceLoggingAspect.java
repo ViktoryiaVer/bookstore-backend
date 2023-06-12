@@ -9,6 +9,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
+import java.util.Arrays;
 @Log4j2
 @Aspect
 @Component
@@ -20,7 +21,7 @@ public class ServiceLoggingAspect {
     public Object logMethod(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
-        Object[] args = joinPoint.getArgs();
+        Object[] args = Arrays.stream(joinPoint.getArgs()).map(Object::toString).toArray();
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
