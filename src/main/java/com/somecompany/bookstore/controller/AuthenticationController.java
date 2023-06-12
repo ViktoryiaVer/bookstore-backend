@@ -6,7 +6,7 @@ import com.somecompany.bookstore.controller.dto.UserDto;
 import com.somecompany.bookstore.controller.dto.response.ValidationResultDto;
 import com.somecompany.bookstore.mapper.UserMapper;
 import com.somecompany.bookstore.security.jwt.JwtUtils;
-import com.somecompany.bookstore.service.UserService;
+import com.somecompany.bookstore.service.api.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,7 +33,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/auth/")
+@RequestMapping("api/auth")
 @Tag(name = "authentication", description = "login and sign up operations")
 @SecurityScheme(
         type = SecuritySchemeType.HTTP,

@@ -7,6 +7,7 @@ import com.somecompany.bookstore.exception.ServiceException;
 import com.somecompany.bookstore.model.entity.User;
 import com.somecompany.bookstore.model.repository.OrderRepository;
 import com.somecompany.bookstore.model.repository.UserRepository;
+import com.somecompany.bookstore.service.api.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -20,21 +21,24 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final MessageSource messageSource;
 
+    @Override
     @LogInvocation
     public Page<User> getAll(Pageable pageable) {
         return userRepository.findAll(pageable);
     }
 
+    @Override
     @LogInvocation
     public User getById(Long id) {
         return userRepository.findByIdOrException(id);
     }
 
+    @Override
     @LogInvocation
     @Transactional
     public User save(User user) {
@@ -50,6 +54,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Override
     @LogInvocation
     @Transactional
     public User update(User user) {
@@ -73,6 +78,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Override
     @LogInvocation
     @Transactional
     public void deleteById(Long id) {

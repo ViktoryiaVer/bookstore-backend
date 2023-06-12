@@ -1,14 +1,14 @@
 package com.somecompany.bookstore.controller;
 
+import com.somecompany.bookstore.controller.dto.response.AuthorsWithPaginationDto;
 import com.somecompany.bookstore.controller.dto.response.MessageDto;
 import com.somecompany.bookstore.controller.dto.response.ValidationResultDto;
 import com.somecompany.bookstore.mapper.AuthorMapper;
 import com.somecompany.bookstore.controller.dto.AuthorDto;
 import com.somecompany.bookstore.model.entity.Author;
-import com.somecompany.bookstore.service.AuthorService;
+import com.somecompany.bookstore.service.api.AuthorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,37 +31,35 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/authors/")
+@RequestMapping("api/authors")
 @Tag(name = "authors", description = "operations with authors")
 public class AuthorController {
     private final AuthorService authorService;
     private final AuthorMapper mapper;
+
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     @Operation(summary = "Get all authors (paginated result)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the authors",
-                    content = {@Content(mediaType = "application/json", array = @ArraySchema(
-                            schema = @Schema(implementation = AuthorDto.class)))}),
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AuthorsWithPaginationDto.class))}),
             @ApiResponse(responseCode = "400", description = "Invalid pageable object supplied",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))}),
             @ApiResponse(responseCode = "401", description = "Error by authentication",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))})})
-    public ResponseEntity<Map<String, Object>> getAllAuthors(@ParameterObject Pageable pageable) {
+    public ResponseEntity<AuthorsWithPaginationDto> getAllAuthors(@ParameterObject Pageable pageable) {
         Page<Author> authorPage = authorService.getAll(pageable);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("authors", authorPage.getContent().stream().map(mapper::toDto).toList());
-        response.put("pageable", authorPage.getPageable());
-        response.put("totalPages", authorPage.getTotalPages());
-        return ResponseEntity.ok(response);
+        AuthorsWithPaginationDto authorsWithPaginationDto = new AuthorsWithPaginationDto();
+        authorsWithPaginationDto.setAuthors(authorPage.getContent().stream().map(mapper::toDto).toList());
+        authorsWithPaginationDto.setTotalPages(authorPage.getTotalPages());
+        return ResponseEntity.ok(authorsWithPaginationDto);
     }
 
     @GetMapping("/{id}")

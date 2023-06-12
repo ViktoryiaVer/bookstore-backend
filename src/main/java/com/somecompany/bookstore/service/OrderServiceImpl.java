@@ -7,6 +7,7 @@ import com.somecompany.bookstore.model.entity.Order;
 import com.somecompany.bookstore.model.entity.enums.OrderStatus;
 import com.somecompany.bookstore.model.repository.OrderRepository;
 import com.somecompany.bookstore.model.repository.PaymentRepository;
+import com.somecompany.bookstore.service.api.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -19,21 +20,24 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class OrderService {
+public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
     private final MessageSource messageSource;
 
+    @Override
     @LogInvocation
     public Page<Order> getAll(Pageable pageable) {
         return orderRepository.findAll(pageable);
     }
 
+    @Override
     @LogInvocation
     public Order getById(Long id) {
         return orderRepository.findByIdOrException(id);
     }
 
+    @Override
     @LogInvocation
     @Transactional
     public Order save(Order order) {
@@ -41,6 +45,7 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    @Override
     @LogInvocation
     @Transactional
     public Order update(Order order) {
@@ -51,6 +56,7 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    @Override
     @LogInvocation
     @Transactional
     public void deleteById(Long id) {

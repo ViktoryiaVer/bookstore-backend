@@ -1,16 +1,16 @@
 package com.somecompany.bookstore.controller;
 
 import com.somecompany.bookstore.controller.dto.BookCreateDto;
+import com.somecompany.bookstore.controller.dto.response.BooksWithPaginationDto;
 import com.somecompany.bookstore.controller.dto.response.MessageDto;
 import com.somecompany.bookstore.controller.dto.response.ValidationResultDto;
 import com.somecompany.bookstore.mapper.BookMapper;
 import com.somecompany.bookstore.mapper.BookCreateMapper;
 import com.somecompany.bookstore.controller.dto.BookDto;
 import com.somecompany.bookstore.model.entity.Book;
-import com.somecompany.bookstore.service.BookService;
+import com.somecompany.bookstore.service.api.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,12 +34,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/books/")
+@RequestMapping("api/books")
 @Tag(name = "books", description = "operations with books")
 public class BookController {
     private final BookService bookService;
@@ -51,22 +49,20 @@ public class BookController {
     @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the books",
-                    content = {@Content(mediaType = "application/json", array = @ArraySchema(
-                            schema = @Schema(implementation = BookDto.class)))}),
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BooksWithPaginationDto.class))}),
             @ApiResponse(responseCode = "400", description = "Invalid pageable object supplied",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))}),
             @ApiResponse(responseCode = "401", description = "Error by authentication",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))})})
-    public ResponseEntity<Map<String, Object>> getAllBooks(@ParameterObject Pageable pageable) {
+    public ResponseEntity<BooksWithPaginationDto> getAllBooks(@ParameterObject Pageable pageable) {
         Page<Book> bookPage = bookService.getAll(pageable);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("books", bookPage.getContent().stream().map(mapper::toDto).toList());
-        response.put("pageable", bookPage.getPageable());
-        response.put("totalPages", bookPage.getTotalPages());
-        return ResponseEntity.ok(response);
+        BooksWithPaginationDto booksWithPaginationDto = new BooksWithPaginationDto();
+        booksWithPaginationDto.setBooks(bookPage.getContent().stream().map(mapper::toDto).toList());
+        booksWithPaginationDto.setTotalPages(bookPage.getTotalPages());
+        return ResponseEntity.ok(booksWithPaginationDto);
     }
 
     @GetMapping("/{id}")

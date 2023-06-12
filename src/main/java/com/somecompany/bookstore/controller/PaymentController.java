@@ -2,14 +2,15 @@ package com.somecompany.bookstore.controller;
 
 import com.somecompany.bookstore.controller.dto.PaymentCreateDto;
 import com.somecompany.bookstore.controller.dto.response.MessageDto;
+import com.somecompany.bookstore.controller.dto.response.PaymentsWithPaginationDto;
 import com.somecompany.bookstore.controller.dto.response.ValidationResultDto;
 import com.somecompany.bookstore.mapper.PaymentCreateMapper;
 import com.somecompany.bookstore.mapper.PaymentMapper;
 import com.somecompany.bookstore.controller.dto.PaymentDto;
-import com.somecompany.bookstore.service.PaymentService;
+import com.somecompany.bookstore.model.entity.Payment;
+import com.somecompany.bookstore.service.api.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +33,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/payments/")
+@RequestMapping("api/payments")
 @Tag(name = "payments", description = "operations with payments")
 public class PaymentController {
     private final PaymentService paymentService;
@@ -47,16 +48,20 @@ public class PaymentController {
     @Operation(summary = "Get all payments (paginated result)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the payments",
-                    content = {@Content(mediaType = "application/json", array = @ArraySchema(
-                            schema = @Schema(implementation = PaymentDto.class)))}),
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PaymentsWithPaginationDto.class))}),
             @ApiResponse(responseCode = "400", description = "Invalid pageable object supplied",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))}),
             @ApiResponse(responseCode = "401", description = "Error by authentication",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))})})
-    public ResponseEntity<List<PaymentDto>> getAllPayments(@ParameterObject Pageable pageable) {
-        return ResponseEntity.ok(paymentService.getAll(pageable).stream().map(mapper::toDto).toList());
+    public ResponseEntity<PaymentsWithPaginationDto> getAllPayments(@ParameterObject Pageable pageable) {
+        Page<Payment> paymentPage = paymentService.getAll(pageable);
+        PaymentsWithPaginationDto paymentsWithPaginationDto = new PaymentsWithPaginationDto();
+        paymentsWithPaginationDto.setPayments(paymentPage.getContent().stream().map(mapper::toDto).toList());
+        paymentsWithPaginationDto.setTotalPages(paymentPage.getTotalPages());
+        return ResponseEntity.ok(paymentsWithPaginationDto);
     }
 
     @GetMapping("/{id}")
