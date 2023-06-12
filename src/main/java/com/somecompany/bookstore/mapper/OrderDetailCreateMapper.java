@@ -3,7 +3,7 @@ package com.somecompany.bookstore.mapper;
 import com.somecompany.bookstore.controller.dto.OrderDetailCreateDto;
 import com.somecompany.bookstore.model.entity.Book;
 import com.somecompany.bookstore.model.entity.OrderDetail;
-import com.somecompany.bookstore.service.BookService;
+import com.somecompany.bookstore.service.api.BookService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;

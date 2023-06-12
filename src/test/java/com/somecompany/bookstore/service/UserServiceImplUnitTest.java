@@ -6,6 +6,7 @@ import com.somecompany.bookstore.exception.ServiceException;
 import com.somecompany.bookstore.model.entity.User;
 import com.somecompany.bookstore.model.repository.OrderRepository;
 import com.somecompany.bookstore.model.repository.UserRepository;
+import com.somecompany.bookstore.service.api.UserService;
 import com.somecompany.bookstore.util.TestObjectUtil;
 import com.somecompany.bookstore.util.constant.TestObjectConstant;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +34,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class, SpringExtension.class})
-class UserServiceUnitTest {
+class UserServiceImplUnitTest {
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -46,7 +47,7 @@ class UserServiceUnitTest {
 
     @BeforeEach
     public void setup() {
-        userService = new UserService(userRepository, orderRepository, messageSource);
+        userService = new UserServiceImpl(userRepository, orderRepository, messageSource);
         userWithoutId = TestObjectUtil.getUserWithoutId();
         userWithId = TestObjectUtil.getUserWithId();
     }

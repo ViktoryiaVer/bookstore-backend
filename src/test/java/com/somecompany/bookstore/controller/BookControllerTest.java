@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.somecompany.bookstore.SecurityConfiguration;
 import com.somecompany.bookstore.controller.dto.BookCreateDto;
 import com.somecompany.bookstore.controller.dto.BookDto;
+import com.somecompany.bookstore.controller.dto.response.BooksWithPaginationDto;
 import com.somecompany.bookstore.controller.dto.response.ValidationResultDto;
 import com.somecompany.bookstore.exception.NotFoundException;
 import com.somecompany.bookstore.exception.ObjectAlreadyExistsException;
@@ -15,7 +16,7 @@ import com.somecompany.bookstore.model.repository.AuthorRepository;
 import com.somecompany.bookstore.security.CustomBasicAuthenticationEntryPoint;
 import com.somecompany.bookstore.security.jwt.JwtAuthenticationFilter;
 import com.somecompany.bookstore.security.jwt.JwtUtils;
-import com.somecompany.bookstore.service.BookService;
+import com.somecompany.bookstore.service.api.BookService;
 import com.somecompany.bookstore.util.TestObjectUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -111,8 +111,8 @@ class BookControllerTest {
                 .andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        List<BookDto> foundBooks = List.of(objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BookDto[].class));
-        assertEquals(bookDtoToRead, foundBooks.get(0));
+        BooksWithPaginationDto foundBooks = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BooksWithPaginationDto.class);
+        assertEquals(bookDtoToRead, foundBooks.getBooks().get(0));
         verify(bookService, times(1)).getAll(pageable);
         verify(bookMapper, times(1)).toDto(bookWithId);
     }

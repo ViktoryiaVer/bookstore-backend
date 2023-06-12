@@ -3,6 +3,7 @@ package com.somecompany.bookstore.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.somecompany.bookstore.SecurityConfiguration;
 import com.somecompany.bookstore.controller.dto.UserDto;
+import com.somecompany.bookstore.controller.dto.response.UsersWithPaginationDto;
 import com.somecompany.bookstore.controller.dto.response.ValidationResultDto;
 import com.somecompany.bookstore.exception.NotFoundException;
 import com.somecompany.bookstore.exception.ObjectAlreadyExistsException;
@@ -12,7 +13,7 @@ import com.somecompany.bookstore.model.entity.User;
 import com.somecompany.bookstore.security.CustomBasicAuthenticationEntryPoint;
 import com.somecompany.bookstore.security.jwt.JwtAuthenticationFilter;
 import com.somecompany.bookstore.security.jwt.JwtUtils;
-import com.somecompany.bookstore.service.UserService;
+import com.somecompany.bookstore.service.api.UserService;
 import com.somecompany.bookstore.util.TestObjectUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,8 +33,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -100,8 +99,8 @@ class UserControllerTest {
                 .andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        List<UserDto> foundUsers = List.of(objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserDto[].class));
-        assertEquals(userDtoWithId, foundUsers.get(0));
+        UsersWithPaginationDto foundUsers = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UsersWithPaginationDto.class);
+        assertEquals(userDtoWithId, foundUsers.getUsers().get(0));
         verify(userService, times(1)).getAll(pageable);
         verify(userMapper, times(1)).toDto(userWithId);
     }

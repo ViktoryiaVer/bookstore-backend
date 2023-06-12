@@ -5,6 +5,7 @@ import com.somecompany.bookstore.exception.ObjectAlreadyExistsException;
 import com.somecompany.bookstore.exception.ServiceException;
 import com.somecompany.bookstore.model.entity.Book;
 import com.somecompany.bookstore.model.repository.BookRepository;
+import com.somecompany.bookstore.service.api.BookService;
 import com.somecompany.bookstore.util.BookstorePostgresqlContainer;
 import com.somecompany.bookstore.util.TestObjectUtil;
 import org.junit.ClassRule;
@@ -23,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-public class BookServiceDbIntegrationTest {
+public class BookServiceImplDbIntegrationTest {
     @ClassRule
     public static final PostgreSQLContainer<BookstorePostgresqlContainer> postgreSQLContainer = BookstorePostgresqlContainer.getInstance();
     @Autowired

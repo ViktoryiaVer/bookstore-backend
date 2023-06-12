@@ -7,6 +7,7 @@ import com.somecompany.bookstore.exception.ServiceException;
 import com.somecompany.bookstore.model.entity.Book;
 import com.somecompany.bookstore.model.repository.BookRepository;
 import com.somecompany.bookstore.model.repository.OrderRepository;
+import com.somecompany.bookstore.service.api.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -20,21 +21,24 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class BookService {
+public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final OrderRepository orderRepository;
     private final MessageSource messageSource;
 
+    @Override
     @LogInvocation
     public Page<Book> getAll(Pageable pageable) {
         return bookRepository.findAll(pageable);
     }
 
+    @Override
     @LogInvocation
     public Book getById(Long id) {
         return bookRepository.findByIdOrException(id);
     }
 
+    @Override
     @LogInvocation
     @Transactional
     public Book save(Book book) {
@@ -45,6 +49,7 @@ public class BookService {
         return bookRepository.save(book);
     }
 
+    @Override
     @LogInvocation
     @Transactional
     public Book update(Book book) {
@@ -61,6 +66,7 @@ public class BookService {
         return bookRepository.save(book);
     }
 
+    @Override
     @LogInvocation
     @Transactional
     public void deleteById(Long id) {

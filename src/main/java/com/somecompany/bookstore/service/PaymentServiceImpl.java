@@ -7,6 +7,7 @@ import com.somecompany.bookstore.exception.ServiceException;
 import com.somecompany.bookstore.model.entity.Payment;
 import com.somecompany.bookstore.model.entity.enums.OrderStatus;
 import com.somecompany.bookstore.model.repository.PaymentRepository;
+import com.somecompany.bookstore.service.api.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -20,20 +21,23 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class PaymentService {
+public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final MessageSource messageSource;
 
+    @Override
     @LogInvocation
     public Page<Payment> getAll(Pageable pageable) {
         return paymentRepository.findAll(pageable);
     }
 
+    @Override
     @LogInvocation
     public Payment getById(Long id) {
         return paymentRepository.findByIdOrException(id);
     }
 
+    @Override
     @LogInvocation
     @Transactional
     public Payment save(Payment payment) {
@@ -49,6 +53,7 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
+    @Override
     @LogInvocation
     @Transactional
     public Payment update(Payment payment) {
@@ -65,6 +70,7 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
+    @Override
     @LogInvocation
     @Transactional
     public void deleteById(Long id) {

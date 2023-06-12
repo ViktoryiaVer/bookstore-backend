@@ -3,7 +3,7 @@ package com.somecompany.bookstore.mapper;
 import com.somecompany.bookstore.controller.dto.OrderCreateDto;
 import com.somecompany.bookstore.model.entity.Order;
 import com.somecompany.bookstore.model.entity.User;
-import com.somecompany.bookstore.service.UserService;
+import com.somecompany.bookstore.service.api.UserService;
 import org.mapstruct.CollectionMappingStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
