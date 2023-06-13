@@ -1,6 +1,5 @@
 package com.somecompany.bookstore.aspect.logging;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -15,8 +14,6 @@ import java.util.Arrays;
 @Component
 @RequiredArgsConstructor
 public class ServiceLoggingAspect {
-    private final ObjectMapper mapper;
-
     @Around("@annotation(com.somecompany.bookstore.aspect.logging.annotation.LogInvocation)")
     public Object logMethod(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getTarget().getClass().getSimpleName();
@@ -31,7 +28,7 @@ public class ServiceLoggingAspect {
         stopWatch.stop();
 
         log.info("Calling service method {} of class {} with arguments: {}. Execution time in milliseconds: {}",
-                methodName, className, mapper.writeValueAsString(args), stopWatch.getTotalTimeMillis());
+                methodName, className, args, stopWatch.getTotalTimeMillis());
         return proceed;
     }
 }
