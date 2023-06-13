@@ -37,8 +37,4 @@ public class OrderDto {
     @Schema(description = "List of the order details")
     @NotNull(message = "{msg.validation.order.detail.null}")
     private List<OrderDetailDto> orderDetails = new ArrayList<>();
-
-    public void addOrderDetailDto(OrderDetailDto detail) {
-        orderDetails.add(detail);
-    }
 }
