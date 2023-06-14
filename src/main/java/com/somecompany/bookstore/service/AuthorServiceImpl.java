@@ -1,10 +1,13 @@
 package com.somecompany.bookstore.service;
 
+import com.querydsl.core.BooleanBuilder;
 import com.somecompany.bookstore.aspect.logging.annotation.LogInvocation;
+import com.somecompany.bookstore.controller.dto.AuthorFilterDto;
 import com.somecompany.bookstore.exception.NotFoundException;
 import com.somecompany.bookstore.exception.ObjectAlreadyExistsException;
 import com.somecompany.bookstore.exception.ServiceException;
 import com.somecompany.bookstore.model.entity.Author;
+import com.somecompany.bookstore.model.entity.QAuthor;
 import com.somecompany.bookstore.model.repository.AuthorRepository;
 import com.somecompany.bookstore.model.repository.BookRepository;
 import com.somecompany.bookstore.service.api.AuthorService;
@@ -28,8 +31,12 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     @LogInvocation
-    public Page<Author> getAll(Pageable pageable) {
-        return authorRepository.findAll(pageable);
+    public Page<Author> getAll(AuthorFilterDto authorFilterDto, Pageable pageable) {
+        BooleanBuilder builder = new BooleanBuilder();
+        if (authorFilterDto.getLastName() != null) {
+            builder.and(QAuthor.author.lastName.eq(authorFilterDto.getLastName()));
+        }
+        return authorRepository.findAll(builder, pageable);
     }
 
     @Override

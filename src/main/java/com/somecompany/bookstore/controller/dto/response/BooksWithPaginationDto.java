@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @Schema(description = "dto for returning paginated result for books")
 public class BooksWithPaginationDto {
+    @Schema(description = "list of books")
     private List<BookDto> books;
+    @Schema(description = "total pages count")
     private Integer totalPages;
 }

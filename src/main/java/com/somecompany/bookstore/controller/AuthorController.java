@@ -1,5 +1,6 @@
 package com.somecompany.bookstore.controller;
 
+import com.somecompany.bookstore.controller.dto.AuthorFilterDto;
 import com.somecompany.bookstore.controller.dto.response.AuthorsWithPaginationDto;
 import com.somecompany.bookstore.controller.dto.response.MessageDto;
 import com.somecompany.bookstore.controller.dto.response.ValidationResultDto;
@@ -53,13 +54,11 @@ public class AuthorController {
             @ApiResponse(responseCode = "401", description = "Error by authentication",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))})})
-    public ResponseEntity<AuthorsWithPaginationDto> getAllAuthors(@ParameterObject Pageable pageable) {
-        Page<Author> authorPage = authorService.getAll(pageable);
+    public ResponseEntity<AuthorsWithPaginationDto> getAllAuthors(@ParameterObject Pageable pageable, @ParameterObject AuthorFilterDto authorFilterDto) {
+        Page<Author> authorPage = authorService.getAll(authorFilterDto, pageable);
 
-        AuthorsWithPaginationDto authorsWithPaginationDto = new AuthorsWithPaginationDto();
-        authorsWithPaginationDto.setAuthors(authorPage.getContent().stream().map(mapper::toDto).toList());
-        authorsWithPaginationDto.setTotalPages(authorPage.getTotalPages());
-        return ResponseEntity.ok(authorsWithPaginationDto);
+        return ResponseEntity.ok(new AuthorsWithPaginationDto(authorPage.getContent().stream().map(mapper::toDto).toList(),
+                authorPage.getTotalPages()));
     }
 
     @GetMapping("/{id}")

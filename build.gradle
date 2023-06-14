@@ -53,13 +53,12 @@ dependencies {
 
     implementation "com.querydsl:querydsl-core:${queryDslVersion}"
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
-    implementation "com.querydsl:querydsl-mongodb:${queryDslVersion}"
     annotationProcessor (
             'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.2.Final',
             'javax.annotation:javax.annotation-api:1.3.2',
             "com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
 
-    annotationProcessor("com.querydsl:querydsl-apt:${queryDslVersion}:general")
+    annotationProcessor("com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
 }
 
 tasks.named('test') {
