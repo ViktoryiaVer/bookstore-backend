@@ -34,7 +34,7 @@ public class AuthorServiceImpl implements AuthorService {
     public Page<Author> getAll(AuthorFilterDto authorFilterDto, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
         if (authorFilterDto.getLastName() != null) {
-            builder.and(QAuthor.author.lastName.eq(authorFilterDto.getLastName()));
+            builder.and(QAuthor.author.lastName.containsIgnoreCase(authorFilterDto.getLastName()));
         }
         return authorRepository.findAll(builder, pageable);
     }
