@@ -43,6 +43,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -146,6 +147,7 @@ class UserControllerTest {
         when(userMapper.toDto(userWithId)).thenReturn(userDtoWithId);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/users/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(userDtoWithoutId)))
                 .andDo(print())
@@ -163,6 +165,7 @@ class UserControllerTest {
     @WithMockUser(authorities = "USER")
     void givenUserWithInsufficientRights_whenRequestUserCreation_thenReturn403() throws Exception {
         this.mockMvc.perform(post("/api/users/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(userDtoWithoutId)))
                 .andDo(print())
@@ -181,6 +184,7 @@ class UserControllerTest {
         when(userMapper.toEntity(userDtoWithoutId)).thenReturn(userWithoutId);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/users/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(userDtoWithoutId)))
                 .andDo(print())
@@ -201,6 +205,7 @@ class UserControllerTest {
         when(userService.save(userWithoutId)).thenThrow(ObjectAlreadyExistsException.class);
 
         this.mockMvc.perform(post("/api/users/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(userDtoWithoutId)))
                 .andDo(print())
@@ -223,6 +228,7 @@ class UserControllerTest {
         when(userMapper.toDto(userWithId)).thenReturn(userDtoWithId);
 
         MvcResult mvcResult = this.mockMvc.perform(put("/api/users/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(userDtoWithId)))
                 .andDo(print())
@@ -240,6 +246,7 @@ class UserControllerTest {
     @WithMockUser(authorities = "USER")
     void givenUserWithInsufficientRights_whenRequestUserUpdate_thenReturn403() throws Exception {
         this.mockMvc.perform(put("/api/users/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(userDtoWithoutId)))
                 .andDo(print())
@@ -260,6 +267,7 @@ class UserControllerTest {
         when(userMapper.toEntity(userDtoWithId)).thenReturn(userWithId);
 
         MvcResult mvcResult = this.mockMvc.perform(put("/api/users/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(userDtoWithId)))
                 .andDo(print())
@@ -280,6 +288,7 @@ class UserControllerTest {
         when(userService.update(userWithId)).thenThrow(ObjectAlreadyExistsException.class);
 
         this.mockMvc.perform(put("/api/users/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(userDtoWithId)))
                 .andDo(print())
@@ -297,7 +306,8 @@ class UserControllerTest {
         Long userId = userWithId.getId();
         doNothing().when(userService).deleteById(userId);
 
-        this.mockMvc.perform(delete("/api/users/" + userId))
+        this.mockMvc.perform(delete("/api/users/" + userId)
+                .with(csrf()))
                 .andDo(print())
                 .andExpectAll(status().isResetContent(), jsonPath("$").doesNotExist());
 
@@ -308,7 +318,8 @@ class UserControllerTest {
     @WithMockUser(authorities = "USER")
     void givenUserWithInsufficientRights_whenRequestUserDelete_thenReturn403() throws Exception {
         Long userId = userWithId.getId();
-        this.mockMvc.perform(delete("/api/users/" + userId))
+        this.mockMvc.perform(delete("/api/users/" + userId)
+                .with(csrf()))
                 .andDo(print())
                 .andExpectAll(status().isForbidden(), content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -321,7 +332,8 @@ class UserControllerTest {
     void givenIdOfInvalidType_whenRequestUserDelete_thenReturn205BadRequest() throws Exception {
         String invalidString = "asf";
 
-        this.mockMvc.perform(delete("/api/users/" + invalidString))
+        this.mockMvc.perform(delete("/api/users/" + invalidString)
+                .with(csrf()))
                 .andDo(print())
                 .andExpectAll(status().isBadRequest(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -336,7 +348,8 @@ class UserControllerTest {
         Long userId = 100L;
         doThrow(NotFoundException.class).when(userService).deleteById(userId);
 
-        this.mockMvc.perform(delete("/api/users/" + userId))
+        this.mockMvc.perform(delete("/api/users/" + userId)
+                .with(csrf()))
                 .andDo(print())
                 .andExpectAll(status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON));
@@ -350,7 +363,8 @@ class UserControllerTest {
         Long userId = userWithId.getId();
         doThrow(ServiceException.class).when(userService).deleteById(userId);
 
-        this.mockMvc.perform(delete("/api/users/" + userId))
+        this.mockMvc.perform(delete("/api/users/" + userId)
+                .with(csrf()))
                 .andDo(print())
                 .andExpectAll(status().isInternalServerError(),
                         content().contentType(MediaType.APPLICATION_JSON));

@@ -49,6 +49,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -159,6 +160,7 @@ class BookControllerTest {
         when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/books/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToSave)))
                 .andDo(print())
@@ -178,6 +180,7 @@ class BookControllerTest {
         when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
 
         this.mockMvc.perform(post("/api/books/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToSave)))
                 .andDo(print())
@@ -196,6 +199,7 @@ class BookControllerTest {
         when(bookCreateMapper.toEntity(bookDtoToSave)).thenReturn(bookWithoutId);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/books/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToSave)))
                 .andDo(print())
@@ -217,6 +221,7 @@ class BookControllerTest {
         when(bookService.save(bookWithoutId)).thenThrow(ObjectAlreadyExistsException.class);
 
         this.mockMvc.perform(post("/api/books/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToSave)))
                 .andDo(print())
@@ -242,6 +247,7 @@ class BookControllerTest {
 
 
         MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/books/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToUpdate)))
                 .andDo(print())
@@ -261,6 +267,7 @@ class BookControllerTest {
         when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
 
         this.mockMvc.perform(put("/api/books/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToUpdate)))
                 .andDo(print())
@@ -283,6 +290,7 @@ class BookControllerTest {
         when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
 
         MvcResult mvcResult = this.mockMvc.perform(put("/api/books/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToUpdate)))
                 .andDo(print())
@@ -304,6 +312,7 @@ class BookControllerTest {
         when(bookService.update(bookWithId)).thenThrow(ObjectAlreadyExistsException.class);
 
         this.mockMvc.perform(put("/api/books/")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToUpdate)))
                 .andDo(print())
@@ -321,7 +330,8 @@ class BookControllerTest {
         Long bookId = bookWithId.getId();
         doNothing().when(bookService).deleteById(bookId);
 
-        this.mockMvc.perform(delete("/api/books/" + bookId))
+        this.mockMvc.perform(delete("/api/books/" + bookId)
+                .with(csrf()))
                 .andDo(print())
                 .andExpectAll(status().isResetContent(), jsonPath("$").doesNotExist());
 
@@ -335,6 +345,7 @@ class BookControllerTest {
         when(authorRepository.existsById(bookWithId.getId())).thenReturn(true);
 
         this.mockMvc.perform(delete("/api/books/" + bookId)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(bookDtoToUpdate)))
                 .andDo(print())
@@ -349,7 +360,8 @@ class BookControllerTest {
     void givenIdOfInvalidType_whenRequestBookDelete_thenReturn205BadRequest() throws Exception {
         String invalidString = "asf";
 
-        this.mockMvc.perform(delete("/api/books/" + invalidString))
+        this.mockMvc.perform(delete("/api/books/" + invalidString)
+                .with(csrf()))
                 .andDo(print())
                 .andExpectAll(status().isBadRequest(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -364,7 +376,8 @@ class BookControllerTest {
         Long bookId = 100L;
         doThrow(NotFoundException.class).when(bookService).deleteById(bookId);
 
-        this.mockMvc.perform(delete("/api/books/" + bookId))
+        this.mockMvc.perform(delete("/api/books/" + bookId)
+                .with(csrf()))
                 .andDo(print())
                 .andExpectAll(status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON));
@@ -378,7 +391,8 @@ class BookControllerTest {
         Long bookId = bookWithId.getId();
         doThrow(ServiceException.class).when(bookService).deleteById(bookId);
 
-        this.mockMvc.perform(delete("/api/books/" + bookId))
+        this.mockMvc.perform(delete("/api/books/" + bookId)
+                .with(csrf()))
                 .andDo(print())
                 .andExpectAll(status().isInternalServerError(),
                         content().contentType(MediaType.APPLICATION_JSON));

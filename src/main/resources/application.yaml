@@ -20,3 +20,8 @@ bookstore:
   app:
     jwtSecret: bookstore
     jwtExpirationMs: 300000
+
+springdoc:
+  swagger-ui:
+    csrf:
+      enabled: true
