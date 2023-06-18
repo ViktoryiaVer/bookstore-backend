@@ -1,5 +1,6 @@
 package com.somecompany.bookstore;
 
+import com.somecompany.bookstore.constant.EndpointConstant;
 import com.somecompany.bookstore.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -40,8 +42,8 @@ public class SecurityConfiguration {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
 
-                .csrf()
-                .disable()
+                .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .and()
 
                 .cors()
                 .and()
@@ -51,12 +53,12 @@ public class SecurityConfiguration {
                 .sameOrigin()
                 .and()
                 .authorizeRequests()
-                .mvcMatchers(HttpMethod.POST, "/api/auth/login/**", "/api/auth/signup/**").permitAll()
-                .mvcMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .mvcMatchers(HttpMethod.GET, "/api/users/**", "/api/books/**", "/api/authors/**", "/api/orders/**", "/api/payments/**").authenticated()
-                .mvcMatchers(HttpMethod.POST, "/api/users/**", "/api/books/**", "/api/authors/**", "/api/orders/**", "/api/payments/**").authenticated()
-                .mvcMatchers(HttpMethod.PUT, "/api/users/**", "/api/books/**", "/api/authors/**", "/api/orders/**", "/api/payments/**").authenticated()
-                .mvcMatchers(HttpMethod.DELETE, "/api/users/**", "/api/books/**", "/api/authors/**", "/api/orders/**", "/api/payments/**").authenticated()
+                .mvcMatchers(HttpMethod.POST, EndpointConstant.LOGIN, EndpointConstant.SIGNUP).permitAll()
+                .mvcMatchers(HttpMethod.GET, EndpointConstant.SWAGGER, EndpointConstant.API_DOCS).permitAll()
+                .mvcMatchers(HttpMethod.GET, EndpointConstant.USERS, EndpointConstant.BOOKS, EndpointConstant.AUTHORS, EndpointConstant.ORDERS, EndpointConstant.PAYMENTS).authenticated()
+                .mvcMatchers(HttpMethod.POST, EndpointConstant.USERS, EndpointConstant.BOOKS, EndpointConstant.AUTHORS, EndpointConstant.ORDERS, EndpointConstant.PAYMENTS).authenticated()
+                .mvcMatchers(HttpMethod.PUT, EndpointConstant.USERS, EndpointConstant.BOOKS, EndpointConstant.AUTHORS, EndpointConstant.ORDERS, EndpointConstant.PAYMENTS).authenticated()
+                .mvcMatchers(HttpMethod.DELETE, EndpointConstant.USERS, EndpointConstant.BOOKS, EndpointConstant.AUTHORS, EndpointConstant.ORDERS, EndpointConstant.PAYMENTS).authenticated()
                 .anyRequest().denyAll()
                 .and()
 
@@ -70,7 +72,7 @@ public class SecurityConfiguration {
     @Order(1)
     public SecurityFilterChain basicAuthSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .mvcMatcher("/api/auth/login/**").authorizeRequests().anyRequest().authenticated()
+                .mvcMatcher(EndpointConstant.LOGIN).authorizeRequests().anyRequest().authenticated()
                 .and()
                 .csrf().disable()
                 .cors()
@@ -96,7 +98,8 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "PUT", "POST", "DELETE", "OPTIONS"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
