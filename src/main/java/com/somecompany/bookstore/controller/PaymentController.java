@@ -1,8 +1,8 @@
 package com.somecompany.bookstore.controller;
 
 import com.somecompany.bookstore.controller.dto.PaymentCreateDto;
+import com.somecompany.bookstore.controller.dto.response.ItemsWithPaginationDto;
 import com.somecompany.bookstore.controller.dto.response.MessageDto;
-import com.somecompany.bookstore.controller.dto.response.PaymentsWithPaginationDto;
 import com.somecompany.bookstore.controller.dto.response.ValidationResultDto;
 import com.somecompany.bookstore.mapper.PaymentCreateMapper;
 import com.somecompany.bookstore.mapper.PaymentMapper;
@@ -49,19 +49,17 @@ public class PaymentController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the payments",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = PaymentsWithPaginationDto.class))}),
+                            schema = @Schema(implementation = ItemsWithPaginationDto.class))}),
             @ApiResponse(responseCode = "400", description = "Invalid pageable object supplied",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))}),
             @ApiResponse(responseCode = "401", description = "Error by authentication",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))})})
-    public ResponseEntity<PaymentsWithPaginationDto> getAllPayments(@ParameterObject Pageable pageable) {
+    public ResponseEntity<ItemsWithPaginationDto<PaymentDto>> getAllPayments(@ParameterObject Pageable pageable) {
         Page<Payment> paymentPage = paymentService.getAll(pageable);
-        PaymentsWithPaginationDto paymentsWithPaginationDto = new PaymentsWithPaginationDto();
-        paymentsWithPaginationDto.setPayments(paymentPage.getContent().stream().map(mapper::toDto).toList());
-        paymentsWithPaginationDto.setTotalPages(paymentPage.getTotalPages());
-        return ResponseEntity.ok(paymentsWithPaginationDto);
+        return ResponseEntity.ok(new ItemsWithPaginationDto<>(paymentPage.getContent().stream().map(mapper::toDto).toList(),
+                paymentPage.getTotalPages()));
     }
 
     @GetMapping("/{id}")
