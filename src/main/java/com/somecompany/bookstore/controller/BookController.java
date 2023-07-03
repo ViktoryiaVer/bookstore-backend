@@ -1,7 +1,7 @@
 package com.somecompany.bookstore.controller;
 
 import com.somecompany.bookstore.controller.dto.BookCreateDto;
-import com.somecompany.bookstore.controller.dto.response.BooksWithPaginationDto;
+import com.somecompany.bookstore.controller.dto.response.ItemsWithPaginationDto;
 import com.somecompany.bookstore.controller.dto.response.MessageDto;
 import com.somecompany.bookstore.controller.dto.response.ValidationResultDto;
 import com.somecompany.bookstore.mapper.BookMapper;
@@ -50,19 +50,17 @@ public class BookController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the books",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = BooksWithPaginationDto.class))}),
+                            schema = @Schema(implementation = ItemsWithPaginationDto.class))}),
             @ApiResponse(responseCode = "400", description = "Invalid pageable object supplied",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))}),
             @ApiResponse(responseCode = "401", description = "Error by authentication",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))})})
-    public ResponseEntity<BooksWithPaginationDto> getAllBooks(@ParameterObject Pageable pageable) {
+    public ResponseEntity<ItemsWithPaginationDto<BookDto>> getAllBooks(@ParameterObject Pageable pageable) {
         Page<Book> bookPage = bookService.getAll(pageable);
-        BooksWithPaginationDto booksWithPaginationDto = new BooksWithPaginationDto();
-        booksWithPaginationDto.setBooks(bookPage.getContent().stream().map(mapper::toDto).toList());
-        booksWithPaginationDto.setTotalPages(bookPage.getTotalPages());
-        return ResponseEntity.ok(booksWithPaginationDto);
+        return ResponseEntity.ok(new ItemsWithPaginationDto<>(bookPage.getContent().stream().map(mapper::toDto).toList(),
+                bookPage.getTotalPages()));
     }
 
     @GetMapping("/{id}")

@@ -1,8 +1,7 @@
 package com.somecompany.bookstore.controller;
 
+import com.somecompany.bookstore.controller.dto.response.ItemsWithPaginationDto;
 import com.somecompany.bookstore.controller.dto.response.MessageDto;
-import com.somecompany.bookstore.controller.dto.response.PaymentsWithPaginationDto;
-import com.somecompany.bookstore.controller.dto.response.UsersWithPaginationDto;
 import com.somecompany.bookstore.controller.dto.response.ValidationResultDto;
 import com.somecompany.bookstore.mapper.UserMapper;
 import com.somecompany.bookstore.controller.dto.UserDto;
@@ -47,19 +46,17 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the users",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = PaymentsWithPaginationDto.class))}),
+                            schema = @Schema(implementation = ItemsWithPaginationDto.class))}),
             @ApiResponse(responseCode = "400", description = "Invalid pageable object supplied",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))}),
             @ApiResponse(responseCode = "401", description = "Error by authentication",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))})})
-    public ResponseEntity<UsersWithPaginationDto> getAllUsers(@ParameterObject Pageable pageable) {
+    public ResponseEntity<ItemsWithPaginationDto<UserDto>> getAllUsers(@ParameterObject Pageable pageable) {
         Page<User> userPage = userService.getAll(pageable);
-        UsersWithPaginationDto usersWithPaginationDto = new UsersWithPaginationDto();
-        usersWithPaginationDto.setUsers(userPage.getContent().stream().map(mapper::toDto).toList());
-        usersWithPaginationDto.setTotalPages(userPage.getTotalPages());
-        return ResponseEntity.ok(usersWithPaginationDto);
+        return ResponseEntity.ok(new ItemsWithPaginationDto<>(userPage.getContent().stream().map(mapper::toDto).toList(),
+                userPage.getTotalPages()));
     }
 
     @GetMapping("/{id}")

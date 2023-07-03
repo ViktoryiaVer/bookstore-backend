@@ -1,7 +1,7 @@
 package com.somecompany.bookstore.controller;
 
 import com.somecompany.bookstore.controller.dto.AuthorFilterDto;
-import com.somecompany.bookstore.controller.dto.response.AuthorsWithPaginationDto;
+import com.somecompany.bookstore.controller.dto.response.ItemsWithPaginationDto;
 import com.somecompany.bookstore.controller.dto.response.MessageDto;
 import com.somecompany.bookstore.controller.dto.response.ValidationResultDto;
 import com.somecompany.bookstore.mapper.AuthorMapper;
@@ -47,17 +47,17 @@ public class AuthorController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the authors",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AuthorsWithPaginationDto.class))}),
+                            schema = @Schema(implementation = ItemsWithPaginationDto.class))}),
             @ApiResponse(responseCode = "400", description = "Invalid pageable object supplied",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))}),
             @ApiResponse(responseCode = "401", description = "Error by authentication",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageDto.class))})})
-    public ResponseEntity<AuthorsWithPaginationDto> getAllAuthors(@ParameterObject Pageable pageable, @ParameterObject AuthorFilterDto authorFilterDto) {
+    public ResponseEntity<ItemsWithPaginationDto<AuthorDto>> getAllAuthors(@ParameterObject Pageable pageable, @ParameterObject AuthorFilterDto authorFilterDto) {
         Page<Author> authorPage = authorService.getAll(authorFilterDto, pageable);
 
-        return ResponseEntity.ok(new AuthorsWithPaginationDto(authorPage.getContent().stream().map(mapper::toDto).toList(),
+        return ResponseEntity.ok(new ItemsWithPaginationDto<>(authorPage.getContent().stream().map(mapper::toDto).toList(),
                 authorPage.getTotalPages()));
     }
 

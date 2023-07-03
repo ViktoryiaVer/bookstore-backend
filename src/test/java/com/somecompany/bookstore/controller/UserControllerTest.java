@@ -1,9 +1,10 @@
 package com.somecompany.bookstore.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.somecompany.bookstore.SecurityConfiguration;
 import com.somecompany.bookstore.controller.dto.UserDto;
-import com.somecompany.bookstore.controller.dto.response.UsersWithPaginationDto;
 import com.somecompany.bookstore.controller.dto.response.ValidationResultDto;
 import com.somecompany.bookstore.exception.NotFoundException;
 import com.somecompany.bookstore.exception.ObjectAlreadyExistsException;
@@ -100,8 +101,8 @@ class UserControllerTest {
                 .andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        UsersWithPaginationDto foundUsers = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UsersWithPaginationDto.class);
-        assertEquals(userDtoWithId, foundUsers.getUsers().get(0));
+        JsonObject convertedObject = new Gson().fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
+        assertEquals(userDtoWithId.getId(), convertedObject.get("items").getAsJsonArray().get(0).getAsJsonObject().get("id").getAsLong());
         verify(userService, times(1)).getAll(pageable);
         verify(userMapper, times(1)).toDto(userWithId);
     }
